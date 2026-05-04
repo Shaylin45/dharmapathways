@@ -383,3 +383,10 @@
       a { color: black; text-decoration: none; }
       .btn-print { display: none !important; }
     }
+
+/* Hotfix: keep tool cards visible even if reveal JS doesn't fire */
+.reveal,
+.reveal.in {
+  opacity: 1 !important;
+  transform: none !important;
+}
