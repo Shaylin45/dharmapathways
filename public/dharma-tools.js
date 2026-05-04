@@ -59,9 +59,13 @@
         a.classList.toggle('active', normalHref === path || (key === 'home' && href === '/'));
       });
 
-      if (PAGE_INIT[key]) PAGE_INIT[key](page);
+      const pageInitKey = page.dataset ? page.dataset.dharmaPageInit : "";
+      if (PAGE_INIT[key] && pageInitKey !== key) {
+        page.dataset.dharmaPageInit = key;
+        PAGE_INIT[key](page);
+      }
       if (key === 'tools') renderPathwaySnapshot(page);
-      if (key === 'next-steps') renderNextSteps(page);
+      if (key === 'next-steps' && pageInitKey === key) renderNextSteps(page);
 
       if (window._revealIO) qsa(page, '.reveal').forEach(el => { if (!el.classList.contains('in')) window._revealIO.observe(el); });
       else qsa(page, '.reveal').forEach(el => el.classList.add('in'));
@@ -126,6 +130,24 @@
       }
 
       initCurrentDharmaPage();
+      let initTimer;
+      const schedulePageInit = () => {
+        clearTimeout(initTimer);
+        initTimer = setTimeout(initCurrentDharmaPage, 60);
+      };
+      ['pushState', 'replaceState'].forEach(method => {
+        const original = history[method];
+        history[method] = function(...args) {
+          const result = original.apply(this, args);
+          schedulePageInit();
+          return result;
+        };
+      });
+      window.addEventListener('popstate', schedulePageInit);
+      const main = document.querySelector('main') || document.body;
+      if (main && 'MutationObserver' in window) {
+        new MutationObserver(schedulePageInit).observe(main, { childList: true, subtree: true });
+      }
     }
 
     if (document.readyState === 'loading') {
