@@ -67,7 +67,10 @@
       else qsa(page, '.reveal').forEach(el => el.classList.add('in'));
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function bootDharmaTools() {
+      if (window.__dharmaToolsBooted) return;
+      window.__dharmaToolsBooted = true;
+
       const toggle = document.querySelector('.nav-toggle');
       const links = document.querySelector('.nav-links');
       if (toggle && links) toggle.addEventListener('click', () => links.classList.toggle('open'));
@@ -123,7 +126,13 @@
       }
 
       initCurrentDharmaPage();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootDharmaTools);
+    } else {
+      bootDharmaTools();
+    }
 
     function buildInstitutionQuestions(institutionName = '', programmeName = '') {
       const institution = institutionName.trim() || '[Institution / provider name]';

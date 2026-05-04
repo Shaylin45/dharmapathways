@@ -76,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         ) : null}
 
-        <Script src="/dharma-tools.js" strategy="lazyOnload" />
+        <Script src="/dharma-tools.js" strategy="afterInteractive" />
       </body>
     </html>
   );
