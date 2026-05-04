@@ -4,14 +4,32 @@ import './globals.css';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dharmapathways.vercel.app';
+const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
+
 export const metadata: Metadata = {
-  title: 'Dharma Pathways — Honest tools for South African education decisions',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Dharma Pathways',
+    template: '%s | Dharma Pathways',
+  },
   description:
     'Free tools to help South African missing-middle families weigh the true cost, real risk, and best fit of every post-school path — from TVET to university.',
+  alternates: {
+    canonical: '/',
+  },
+  keywords: [
+    'South Africa education planning',
+    'missing middle education',
+    'university cost calculator',
+    'TVET route comparison',
+    'career fit checker',
+    'Dharma Pathways',
+  ],
   openGraph: {
     title: 'Dharma Pathways',
     description: 'Honest, independent education guidance for South African families.',
-    url: 'https://www.dharmapathways.org.za/',
+    url: siteUrl,
     siteName: 'Dharma Pathways',
     locale: 'en_ZA',
     type: 'website',
@@ -30,20 +48,35 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const orgJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Dharma Pathways',
+    url: siteUrl,
+    logo: 'https://www.dharmapathways.org.za/dharama-pathways-logo-notext.PNG',
+    sameAs: ['https://www.dharmapathways.org.za/'],
+  };
+
   return (
-    <html lang="en">
+    <html lang="en-ZA">
       <body>
         <Navigation />
         <main>{children}</main>
         <Footer />
 
-        {/* Replace REPLACE_WITH_YOUR_TOKEN once Cloudflare Web Analytics is enabled. */}
-        <Script
-          src="https://static.cloudflareinsights.com/beacon.min.js"
-          strategy="afterInteractive"
-          data-cf-beacon='{"token": "REPLACE_WITH_YOUR_TOKEN"}'
-        />
-        <Script src="/dharma-tools.js" strategy="afterInteractive" />
+        <Script id="org-jsonld" type="application/ld+json" strategy="afterInteractive">
+          {JSON.stringify(orgJsonLd)}
+        </Script>
+
+        {cfBeaconToken ? (
+          <Script
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            strategy="afterInteractive"
+            data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+          />
+        ) : null}
+
+        <Script src="/dharma-tools.js" strategy="lazyOnload" />
       </body>
     </html>
   );
