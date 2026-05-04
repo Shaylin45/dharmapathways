@@ -33,13 +33,13 @@ export const metadata: Metadata = {
     siteName: 'Dharma Pathways',
     locale: 'en_ZA',
     type: 'website',
-    images: ['https://www.dharmapathways.org.za/dharama-pathways-logo-notext.PNG'],
+    images: ['/logo.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Dharma Pathways',
     description: 'Honest, independent education guidance for South African families.',
-    images: ['https://www.dharmapathways.org.za/dharama-pathways-logo-notext.PNG'],
+    images: ['/logo.png'],
   },
   robots: {
     index: true,
@@ -53,7 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     '@type': 'Organization',
     name: 'Dharma Pathways',
     url: siteUrl,
-    logo: 'https://www.dharmapathways.org.za/dharama-pathways-logo-notext.PNG',
+    logo: '/logo.png',
     sameAs: ['https://www.dharmapathways.org.za/'],
   };
 
