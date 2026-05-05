@@ -247,6 +247,7 @@
     function initRealityCheck(page) {
       const form = qs(page, '#rcForm');
       const result = qs(page, '#rcResult');
+      if (!form || !result) return false;
 
       const saved = dharmaStore.get('reality');
       if (saved) {

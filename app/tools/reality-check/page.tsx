@@ -1,6 +1,5 @@
-import RawHtml from '@/components/RawHtml';
-import { reality_checkHtml } from '@/components/pageHtml';
+import RealityCheckTool from '@/components/tools/RealityCheckTool';
 
 export default function Page() {
-  return <RawHtml html={reality_checkHtml} />;
+  return <RealityCheckTool />;
 }
