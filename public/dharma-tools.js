@@ -69,7 +69,8 @@
       const pageInitKey = page.dataset ? page.dataset.dharmaPageInit : "";
       if (PAGE_INIT[key] && pageInitKey !== key) {
         try {
-          PAGE_INIT[key](page);
+          const didInit = PAGE_INIT[key](page);
+          if (didInit === false) return;
           page.dataset.dharmaPageInit = key;
         } catch (error) {
           if (page.dataset) delete page.dataset.dharmaPageInit;
@@ -526,7 +527,7 @@
       const routeB = qs(page,'#routeB');
       const form = qs(page,'#routeForm');
       const result = qs(page,'#routeResult');
-      if (!routeA || !routeB || !form || !result) return;
+      if (!routeA || !routeB || !form || !result) return false;
 
       routeA.innerHTML = routeInputs('a');
       routeB.innerHTML = routeInputs('b');
@@ -717,7 +718,7 @@
       const styleWrap = qs(page,'#styleSliders');
       const form = qs(page,'#fitForm');
       const result = qs(page,'#fitResult');
-      if (!interestWrap || !styleWrap || !form || !result) return;
+      if (!interestWrap || !styleWrap || !form || !result) return false;
 
       const interestIds = ['iAna','iCre','iPeo','iHan','iCar','iEnt'];
       interestWrap.innerHTML = sliderDefs.filter(s=>interestIds.includes(s[0])).map(sliderHTML).join('');
