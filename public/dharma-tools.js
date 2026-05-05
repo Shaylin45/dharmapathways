@@ -188,11 +188,6 @@
       }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', bootDharmaTools);
-    } else {
-      bootDharmaTools();
-    }
 
     function buildInstitutionQuestions(institutionName = '', programmeName = '') {
       const institution = institutionName.trim() || '[Institution / provider name]';
@@ -1230,3 +1225,11 @@
     function renderPathwayCard(label, p, cls) {
       return `<div class="pathway-card ${cls}"><div class="pathway-label">${label}</div><h3>${p.title}</h3><p>${p.summary}</p><div class="pathway-facts"><div><div class="pathway-fact-label">Cost</div><div class="pathway-fact-value">${p.cost}</div></div><div><div class="pathway-fact-label">Duration</div><div class="pathway-fact-value">${p.duration}</div></div><div><div class="pathway-fact-label">Qualification</div><div class="pathway-fact-value">${p.qualification}</div></div></div>${p.tradeoffs?`<p><strong>Trade-offs:</strong> ${p.tradeoffs}</p>`:''}<p style="margin:0;"><strong style="color:var(--terracotta);">This week:</strong> ${p.thisWeek}</p></div>`;
     }
+
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bootDharmaTools);
+    } else {
+      setTimeout(bootDharmaTools, 0);
+    }
+
