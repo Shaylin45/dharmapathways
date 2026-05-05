@@ -145,6 +145,22 @@
         if (links && e.target.closest('.nav-links a')) links.classList.remove('open');
       });
 
+      document.addEventListener('submit', e => {
+        const form = e.target instanceof HTMLFormElement ? e.target : null;
+        if (!form || (form.id !== 'routeForm' && form.id !== 'fitForm')) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const page = form.closest('.page-section') || document;
+        if (form.id === 'routeForm') submitRouteCompareForm(page);
+        if (form.id === 'fitForm') submitFitCheckForm(page);
+      }, true);
+
       if ('IntersectionObserver' in window) {
         window._revealIO = new IntersectionObserver(entries => {
           entries.forEach(entry => {
@@ -522,6 +538,68 @@
       return mode === 'lower' ? (aVal < bVal ? aName : bName) : (aVal > bVal ? aName : bName);
     }
 
+
+    function submitRouteCompareForm(page) {
+      const result = qs(page,'#routeResult');
+      if (!result) return false;
+
+      const qualLabels = { hcert:'Higher Certificate', acert:'Advanced Certificate', diploma:'Diploma', adip:'Advanced Diploma', bachelor:"Bachelor’s", hons:'Honours', pgdip:'PG Diploma', masters:"Master’s", phd:'Doctorate', ncv:'TVET', trade:'Trade' };
+      const a = readRoute(page,'a'), b = readRoute(page,'b');
+      const sa = scoreRoute(a), sb = scoreRoute(b);
+      qs(page,'#thA').textContent = a.name;
+      qs(page,'#thB').textContent = b.name;
+
+      const rows = [
+        ['Qualification level', qualLabels[a.qual]||'—', qualLabels[b.qual]||'—', '—'],
+        ['Total cost', formatR(a.cost), formatR(b.cost), edge(a.name,b.name,a.cost,b.cost,'lower')],
+        ['Time invested', a.duration+' years', b.duration+' years', edge(a.name,b.name,a.duration,b.duration,'lower')],
+        ['Funding secured', a.support+'%', b.support+'%', edge(a.name,b.name,a.support,b.support,'higher')],
+        ['Funding certainty', a.fundingCertainty+'/100', b.fundingCertainty+'/100', edge(a.name,b.name,a.fundingCertainty,b.fundingCertainty,'higher')],
+        ['Admission realism', a.admission+'/100', b.admission+'/100', edge(a.name,b.name,a.admission,b.admission,'higher')],
+        ['Accreditation confidence', a.accreditation+'/100', b.accreditation+'/100', edge(a.name,b.name,a.accreditation,b.accreditation,'higher')],
+        ['Completion confidence', a.completion+'/100', b.completion+'/100', edge(a.name,b.name,a.completion,b.completion,'higher')],
+        ['Workplace exposure', a.workIntegrated+'/100', b.workIntegrated+'/100', edge(a.name,b.name,a.workIntegrated,b.workIntegrated,'higher')],
+        ['Job certainty', a.job+'%', b.job+'%', edge(a.name,b.name,a.job,b.job,'higher')],
+        ['Out-of-pocket exposure', formatR(sa.exposure), formatR(sb.exposure), edge(a.name,b.name,sa.exposure,sb.exposure,'lower')],
+        ['Overall safety score', Math.round(sa.total)+'/100', Math.round(sb.total)+'/100', Math.abs(sa.total-sb.total)<5?'Tied':(sa.total>sb.total?a.name:b.name)]
+      ];
+
+      qs(page,'#compareTbody').innerHTML = rows.map(r =>
+        `<tr><td>${r[0]}</td><td class="${r[3]===a.name?'winner':''}">${r[1]}</td><td class="${r[3]===b.name?'winner':''}">${r[2]}</td><td>${r[3]}</td></tr>`
+      ).join('');
+
+      const diff = sa.total - sb.total;
+      let verdict, body;
+      if (Math.abs(diff) < 5) { verdict = `${a.name} and ${b.name} are roughly equivalent.`; body = 'Neither is meaningfully safer. Fit and household preference should decide.'; }
+      else if (diff > 0) { verdict = `${a.name} is the safer route on these inputs.`; body = `${a.name} scores ${Math.round(sa.total)}/100 vs ${Math.round(sb.total)}/100 for ${b.name}.`; }
+      else { verdict = `${b.name} is the safer route on these inputs.`; body = `${b.name} scores ${Math.round(sb.total)}/100 vs ${Math.round(sa.total)}/100 for ${a.name}.`; }
+      qs(page,'#routeVerdict').textContent = verdict;
+      qs(page,'#routeVerdict').className = 'verdict ' + (Math.abs(diff)<5?'amber':'green');
+      qs(page,'#routeVerdictBody').textContent = body;
+
+      const impls = [];
+      const reality = dharmaStore.get('reality');
+      if (reality && reality.capacity > 0) {
+        const aM = sa.exposure/(a.duration*12), bM = sb.exposure/(b.duration*12);
+        if (aM>reality.capacity||bM>reality.capacity) impls.push(`Monthly check: ${a.name} needs ~${formatR(aM)}/mo, ${b.name} needs ~${formatR(bM)}/mo, against your capacity of ${formatR(reality.capacity)}/mo.`);
+      }
+      if (a.duration>4||b.duration>4) impls.push('Programmes longer than four years carry greater dropout and cost-overrun risk.');
+      if (a.job<50||b.job<50) impls.push('One route has below-50% job certainty. Treat that as high-risk unless you have specific evidence.');
+      if (a.accreditation<60||b.accreditation<60) impls.push('One route has unverified accreditation. Do not pay deposits until official accreditation is confirmed.');
+      if (a.admission<50||b.admission<50) impls.push('One route is a stretch for admission. Have a backup route ready before relying on it.');
+      if (a.fundingCertainty<50||b.fundingCertainty<50) impls.push('One route depends on uncertain funding. Treat it as provisional until confirmed in writing.');
+      if (a.completion<55||b.completion<55) impls.push('One route has high completion risk. Ask about support structures, repeat-year costs and pass rates.');
+      if (a.workIntegrated<60||b.workIntegrated<60) impls.push('One route has weak workplace exposure. This can make first-job entry harder even with the qualification.');
+      if (sa.exposure>300000||sb.exposure>300000) impls.push('One or both options carry over R300,000 of exposure. Make sure earning potential justifies the debt.');
+      if (!impls.length) impls.push('Both routes look broadly reasonable. Career Fit is now the deciding factor.');
+
+      renderList(qs(page,'#routeImplications'), impls);
+      dharmaStore.set('compare', { a, b, sa, sb });
+      result.classList.remove('hidden');
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return true;
+    }
+
     function initRouteCompare(page) {
       const routeA = qs(page,'#routeA');
       const routeB = qs(page,'#routeB');
@@ -711,6 +789,44 @@
 
     function labelForMark(key) {
       return { math:'Maths', science:'Physical Sciences', english:'English', accounting:'Accounting/Business', lifeScience:'Life Sciences', overall:'Overall average' }[key] || key;
+    }
+
+
+    function submitFitCheckForm(page) {
+      const result = qs(page,'#fitResult');
+      if (!result) return false;
+
+      const profile={};
+      sliderDefs.forEach(([id])=>profile[id]=+qs(page,'#'+id).value);
+      const marks={
+        math:+qs(page,'#mathMark').value||0, science:+qs(page,'#scienceMark').value||0,
+        english:+qs(page,'#englishMark').value||0, accounting:+qs(page,'#accountingMark').value||0,
+        lifeScience:+qs(page,'#lifeScienceMark').value||0, overall:+qs(page,'#overallMark').value||0
+      };
+      const ranked = careers.map(c => {
+        const fitScore=careerScore(c,profile), readiness=readinessScore(c,marks);
+        const combined=Math.round(fitScore*0.7+readiness.score*0.3);
+        return {...c, match:combined, fitScore, readinessScore:readiness.score, readinessNotes:readiness.notes};
+      }).sort((a,b)=>b.match-a.match);
+      const top=ranked.slice(0,4), topMatch=top[0].match;
+      let verdict, cls='green', body;
+      if (topMatch>=75) { verdict=`Strong fit signal — your top match is ${top[0].title}.`; body='Your interest and style profile points clearly toward this field. The next few are also worth exploring.'; }
+      else if (topMatch>=60) { verdict='Reasonable fit signals across several fields.'; cls='amber'; body='No single field jumps out, but several match meaningfully. Pick the top 2–3 and investigate real day-to-day work.'; }
+      else { verdict='Mixed signal — slow down before choosing.'; cls='amber'; body='Your profile did not strongly match any mapped field. Try again with more conviction or seek more career exposure before committing.'; }
+      qs(page,'#fitVerdict').textContent=verdict;
+      qs(page,'#fitVerdict').className='verdict '+cls;
+      qs(page,'#fitVerdictBody').textContent=body;
+      qs(page,'#careerList').innerHTML=top.map(c=>`<div class="career-item"><div class="match">${c.match}% overall match · ${c.fitScore}% fit · ${c.readinessScore}% readiness</div><h4>${c.title}</h4><p>${c.blurb}</p><p style="margin-top:0.75rem;font-size:0.85rem;color:rgba(250,247,242,0.65);"><strong>Typical routes in SA:</strong> ${c.routes}</p>${c.readinessNotes.length?`<ul style="margin-top:0.75rem;padding-left:1.2rem;">${c.readinessNotes.map(n=>`<li style="font-size:0.85rem;color:rgba(250,247,242,0.78);">${n}</li>`).join('')}</ul>`:''}</div>`).join('');
+      const impls=['This is a sense-check, not a verdict. Job-shadowing, vacation work and conversations with people in the field matter.','The readiness score is not a formal APS calculation. It flags whether your marks support common routes.','Take your top 1–2 matches to Route Compare and test a university route against a TVET/diploma or bridging alternative.'];
+      if (profile.iPeo>75&&profile.iCar>70) impls.push('Strong people-and-care signal. Health, education and social work are worth investigating.');
+      if (profile.iHan>70&&profile.wOut>60) impls.push('Hands-on plus outdoor preference favours trades, engineering site work, agriculture or skilled construction.');
+      renderList(qs(page,'#fitImplications'),impls);
+      dharmaStore.set('fit',{profile,marks,top:top.map(c=>c.title),detailedTop:top.map(c=>({title:c.title,match:c.match,fitScore:c.fitScore,readinessScore:c.readinessScore,readinessNotes:c.readinessNotes}))});
+      renderReadinessPlan(page, top);
+      renderAlternativeFinder(qs(page, '#careerAlternativeFinder'), top[0]?.title || '', true);
+      result.classList.remove('hidden');
+      result.scrollIntoView({behavior:'smooth',block:'start'});
+      return true;
     }
 
     function initFitCheck(page) {
