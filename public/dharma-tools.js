@@ -27,30 +27,37 @@
       'next-steps': initNextSteps
     };
 
+    const PAGE_PATHS = {
+      '/': 'home',
+      '/tools': 'tools',
+      '/about': 'about',
+      '/research': 'research',
+      '/privacy': 'privacy',
+      '/terms': 'terms',
+      '/contact': 'contact',
+      '/tools/reality-check': 'reality-check',
+      '/tools/cost-calculator': 'cost-calculator',
+      '/tools/route-compare': 'route-compare',
+      '/tools/fit-check': 'fit-check',
+      '/tools/next-steps': 'next-steps'
+    };
+
     function currentDharmaPageKey() {
-      const page = document.querySelector('.page-section');
-      if (page && page.dataset.page) return page.dataset.page;
       const path = window.location.pathname.replace(/\/$/, '') || '/';
-      const map = {
-        '/': 'home',
-        '/tools': 'tools',
-        '/about': 'about',
-        '/research': 'research',
-        '/privacy': 'privacy',
-        '/terms': 'terms',
-        '/contact': 'contact',
-        '/tools/reality-check': 'reality-check',
-        '/tools/cost-calculator': 'cost-calculator',
-        '/tools/route-compare': 'route-compare',
-        '/tools/fit-check': 'fit-check',
-        '/tools/next-steps': 'next-steps'
-      };
-      return map[path] || 'home';
+      if (PAGE_PATHS[path]) return PAGE_PATHS[path];
+      const page = document.querySelector('.page-section');
+      return page?.dataset?.page || 'home';
     }
 
     function initCurrentDharmaPage() {
       const key = currentDharmaPageKey();
-      const page = document.querySelector(`[data-page="${key}"]`) || document.querySelector('.page-section') || document;
+      let page = document.querySelector(`[data-page="${key}"]`);
+
+      // During client-side navigation, Next can update the URL before the new
+      // page DOM is mounted. Wait for the mutation observer to retry instead of
+      // initialising the previous page with the new route's handlers.
+      if (!page && (PAGE_INIT[key] || key === 'tools')) return;
+      if (!page) page = document.querySelector('.page-section') || document;
 
       document.querySelectorAll('.nav-links a').forEach(a => {
         const href = a.getAttribute('href') || '';
@@ -61,8 +68,14 @@
 
       const pageInitKey = page.dataset ? page.dataset.dharmaPageInit : "";
       if (PAGE_INIT[key] && pageInitKey !== key) {
-        page.dataset.dharmaPageInit = key;
-        PAGE_INIT[key](page);
+        try {
+          PAGE_INIT[key](page);
+          page.dataset.dharmaPageInit = key;
+        } catch (error) {
+          if (page.dataset) delete page.dataset.dharmaPageInit;
+          console.error('Dharma tool initialization failed:', key, error);
+          return;
+        }
       }
       if (key === 'tools') renderPathwaySnapshot(page);
       if (key === 'next-steps' && pageInitKey === key) renderNextSteps(page);
@@ -77,9 +90,22 @@
 
       const toggle = document.querySelector('.nav-toggle');
       const links = document.querySelector('.nav-links');
+      let initTimer;
+      const schedulePageInit = (delay = 80) => {
+        clearTimeout(initTimer);
+        initTimer = setTimeout(initCurrentDharmaPage, delay);
+      };
       if (toggle && links) toggle.addEventListener('click', () => links.classList.toggle('open'));
 
       document.addEventListener('click', e => {
+        const target = e.target instanceof Element ? e.target : null;
+        if (!target) return;
+
+        const internalLink = target.closest('a[href^="/tools"], a[href="/"], a[href^="/about"], a[href^="/research"], a[href^="/contact"], a[href^="/privacy"], a[href^="/terms"]');
+        if (internalLink) {
+          schedulePageInit(120);
+          setTimeout(initCurrentDharmaPage, 360);
+        }
         const openQuestions = e.target.closest('[data-open-questions]');
         if (openQuestions) {
           const section = openQuestions.closest('.result-panel') || openQuestions.closest('.page-section') || document;
@@ -130,11 +156,6 @@
       }
 
       initCurrentDharmaPage();
-      let initTimer;
-      const schedulePageInit = () => {
-        clearTimeout(initTimer);
-        initTimer = setTimeout(initCurrentDharmaPage, 60);
-      };
       ['pushState', 'replaceState'].forEach(method => {
         const original = history[method];
         history[method] = function(...args) {
@@ -501,8 +522,14 @@
     }
 
     function initRouteCompare(page) {
-      qs(page,'#routeA').innerHTML = routeInputs('a');
-      qs(page,'#routeB').innerHTML = routeInputs('b');
+      const routeA = qs(page,'#routeA');
+      const routeB = qs(page,'#routeB');
+      const form = qs(page,'#routeForm');
+      const result = qs(page,'#routeResult');
+      if (!routeA || !routeB || !form || !result) return;
+
+      routeA.innerHTML = routeInputs('a');
+      routeB.innerHTML = routeInputs('b');
       const templateGrid = qs(page, '#routeTemplateGrid');
       if (templateGrid) {
         templateGrid.innerHTML = routeTemplates.map((template, index) => `<button type="button" class="template-card" data-template-index="${index}"><strong>${template.title}</strong><span>${template.description}</span></button>`).join('');
@@ -519,7 +546,6 @@
       });
 
       const qualLabels = { hcert:'Higher Certificate', acert:'Advanced Certificate', diploma:'Diploma', adip:'Advanced Diploma', bachelor:"Bachelor’s", hons:'Honours', pgdip:'PG Diploma', masters:"Master’s", phd:'Doctorate', ncv:'TVET', trade:'Trade' };
-      const form = qs(page,'#routeForm'), result = qs(page,'#routeResult');
       form.addEventListener('reset', () => { result.classList.add('hidden'); qs(page,'#aJobOut').textContent='50%'; qs(page,'#bJobOut').textContent='50%'; });
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -687,14 +713,19 @@
     }
 
     function initFitCheck(page) {
+      const interestWrap = qs(page,'#interestSliders');
+      const styleWrap = qs(page,'#styleSliders');
+      const form = qs(page,'#fitForm');
+      const result = qs(page,'#fitResult');
+      if (!interestWrap || !styleWrap || !form || !result) return;
+
       const interestIds = ['iAna','iCre','iPeo','iHan','iCar','iEnt'];
-      qs(page,'#interestSliders').innerHTML = sliderDefs.filter(s=>interestIds.includes(s[0])).map(sliderHTML).join('');
-      qs(page,'#styleSliders').innerHTML = sliderDefs.filter(s=>!interestIds.includes(s[0])).map(sliderHTML).join('');
+      interestWrap.innerHTML = sliderDefs.filter(s=>interestIds.includes(s[0])).map(sliderHTML).join('');
+      styleWrap.innerHTML = sliderDefs.filter(s=>!interestIds.includes(s[0])).map(sliderHTML).join('');
       sliderDefs.forEach(([id]) => {
         const s=qs(page,'#'+id), o=qs(page,'#'+id+'Out');
         s.addEventListener('input', ()=>o.textContent=s.value+'%');
       });
-      const form=qs(page,'#fitForm'), result=qs(page,'#fitResult');
       form.addEventListener('reset', ()=>{ result.classList.add('hidden'); sliderDefs.forEach(([id])=>qs(page,'#'+id+'Out').textContent='50%'); });
       form.addEventListener('submit', e => {
         e.preventDefault();
