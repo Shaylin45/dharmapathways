@@ -1,6 +1,5 @@
-import RawHtml from '@/components/RawHtml';
-import { route_compareHtml } from '@/components/pageHtml';
+import { RouteCompareTool } from '@/components/tools/RouteCompareTool';
 
 export default function Page() {
-  return <RawHtml html={route_compareHtml} />;
+  return <RouteCompareTool />;
 }
