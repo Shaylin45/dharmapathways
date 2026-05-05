@@ -449,3 +449,59 @@
 .result-ordered-list { padding-left: var(--space-6); }
 .result-ordered-list li { color: rgba(250,247,242,0.85); margin-bottom: var(--space-2); }
 @media (max-width: 760px) { .dimension-grid { grid-template-columns: 1fr; } }
+
+/* React True Cost Calculator */
+.cost-live-preview {
+  background: var(--paper-deep);
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--terracotta);
+  margin-top: var(--space-6);
+  padding: var(--space-6);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-6);
+  align-items: center;
+}
+.cost-live-preview h3 { margin: var(--space-2) 0 var(--space-3); }
+.cost-live-preview p { margin-bottom: 0; }
+.cost-preview-stat {
+  text-align: right;
+  border-left: 1px solid var(--line);
+  padding-left: var(--space-6);
+  min-width: 190px;
+}
+.cost-preview-stat strong {
+  display: block;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.cost-preview-stat span {
+  color: var(--ink-mute);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.cost-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+.cost-insight-box {
+  background: rgba(250,247,242,0.08);
+  border: 1px solid rgba(250,247,242,0.16);
+  padding: var(--space-6);
+  border-radius: 2px;
+}
+.cost-insight-box h4 { margin-bottom: var(--space-4); }
+.cost-insight-box p:last-child { margin-bottom: 0; }
+.result-panel .residence-risk .eyebrow,
+.result-panel .funding-guidance .eyebrow { color: var(--terracotta-soft); }
+@media (max-width: 760px) {
+  .cost-live-preview,
+  .cost-result-grid { grid-template-columns: 1fr; }
+  .cost-preview-stat { text-align: left; border-left: 0; border-top: 1px solid var(--line); padding-left: 0; padding-top: var(--space-4); }
+}

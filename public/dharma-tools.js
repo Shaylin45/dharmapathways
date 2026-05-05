@@ -367,6 +367,10 @@
 
     // ─── TOOL 2: TRUE COST CALCULATOR ─────────────────────────────────────────────
     function initCostCalculator(page) {
+      const form = qs(page, '#costForm');
+      const result = qs(page, '#costResult');
+      const inputs = qs(page, '#costInputs');
+      if (!form || !result || !inputs) return false;
       const costFields = [
         ['tuition','Tuition fees','e.g. 65000'],['reg','Registration & admin fees','e.g. 6000'],
         ['accom','Accommodation','e.g. 60000'],['food','Food & groceries','e.g. 36000'],
@@ -393,8 +397,6 @@
         Object.entries(p).forEach(([id,val]) => { const el = qs(page,'#'+id); if (el) el.value = val; });
       });
 
-      const form = qs(page,'#costForm');
-      const result = qs(page,'#costResult');
       form.addEventListener('reset', () => { result.classList.add('hidden'); setTimeout(() => { const p = qs(page,'#pathwayType'); if (p) p.value=''; }, 0); });
       form.addEventListener('submit', e => {
         e.preventDefault();

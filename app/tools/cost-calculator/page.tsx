@@ -1,6 +1,5 @@
-import RawHtml from '@/components/RawHtml';
-import { cost_calculatorHtml } from '@/components/pageHtml';
+import { TrueCostTool } from '@/components/tools/TrueCostTool';
 
 export default function Page() {
-  return <RawHtml html={cost_calculatorHtml} />;
+  return <TrueCostTool />;
 }
