@@ -6,7 +6,6 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://dharmapathways.vercel.app';
-const cfBeaconToken = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -69,16 +68,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script id="org-jsonld" nonce={nonce} type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify(orgJsonLd)}
         </Script>
-
-        {cfBeaconToken ? (
-          <Script
-            nonce={nonce}
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            strategy="afterInteractive"
-            data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
-          />
-        ) : null}
-
         <Script nonce={nonce} src="/dharma-tools.js" strategy="afterInteractive" />
       </body>
     </html>
