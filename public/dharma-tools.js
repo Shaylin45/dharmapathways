@@ -14,7 +14,15 @@
     const moneyInput = (id, label, ph = 'e.g. 0') =>
       `<div class="form-group"><label for="${id}">${label}</label><div class="prefix-input"><input type="number" id="${id}" min="0" step="100" placeholder="${ph}" /></div></div>`;
 
-    function renderList(ul, items) { ul.innerHTML = items.map(i => `<li>${i}</li>`).join(''); }
+    function renderList(ul, items) {
+      if (!ul) return;
+      ul.replaceChildren();
+      items.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+    }
     function titleCase(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : ''; }
 
 
@@ -189,6 +197,22 @@
     }
 
 
+    function renderCompareRows(tbody, rows, leftName, rightName) {
+      if (!tbody) return;
+      tbody.replaceChildren();
+      rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        row.forEach((value, index) => {
+          const td = document.createElement('td');
+          td.textContent = value;
+          if (index === 1 && row[3] === leftName) td.className = 'winner';
+          if (index === 2 && row[3] === rightName) td.className = 'winner';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
     function buildInstitutionQuestions(institutionName = '', programmeName = '') {
       const institution = institutionName.trim() || '[Institution / provider name]';
       const programme = programmeName.trim() || '[Programme / qualification name]';
@@ -212,6 +236,7 @@
       const reality = dharmaStore.get('reality');
       const cost = dharmaStore.get('cost');
       const fit = dharmaStore.get('fit');
+      const nextAction = getSnapshotNextAction(reality, cost, fit);
       const items = [
         ['Affordability pressure', reality ? titleCase(reality.pressure) : 'Not completed yet', !!reality],
         ['Funding bracket', reality ? reality.bracket : 'Not completed yet', !!reality],
@@ -219,10 +244,30 @@
         ['Last costed route / scenario', cost ? inferLastCostedRoute(cost) : 'Not completed yet', !!cost],
         ['Monthly burden', cost ? formatR(cost.netMonthly) + '/mo' : 'Not completed yet', !!cost],
         ['Top career fit', fit && fit.top && fit.top[0] ? fit.top[0] : 'Not completed yet', !!fit],
-        ['Recommended next action', getSnapshotNextAction(reality, cost, fit).short, true]
+        ['Recommended next action', nextAction.short, true]
       ];
-      grid.innerHTML = items.map(([label, value, done]) => `<div class="snapshot-item"><div class="snapshot-label">${label}</div><div class="snapshot-value ${done ? '' : 'muted'}">${value}</div></div>`).join('');
-      action.innerHTML = `<strong>Recommended next action:</strong> ${getSnapshotNextAction(reality, cost, fit).long}`;
+
+      grid.replaceChildren();
+      items.forEach(([label, value, done]) => {
+        const item = document.createElement('div');
+        item.className = 'snapshot-item';
+
+        const labelEl = document.createElement('div');
+        labelEl.className = 'snapshot-label';
+        labelEl.textContent = label;
+
+        const valueEl = document.createElement('div');
+        valueEl.className = 'snapshot-value' + (done ? '' : ' muted');
+        valueEl.textContent = value;
+
+        item.append(labelEl, valueEl);
+        grid.appendChild(item);
+      });
+
+      action.replaceChildren();
+      const strong = document.createElement('strong');
+      strong.textContent = 'Recommended next action:';
+      action.append(strong, document.createTextNode(' ' + nextAction.long));
     }
 
     function inferLastCostedRoute(cost) {
@@ -562,9 +607,7 @@
         ['Overall safety score', Math.round(sa.total)+'/100', Math.round(sb.total)+'/100', Math.abs(sa.total-sb.total)<5?'Tied':(sa.total>sb.total?a.name:b.name)]
       ];
 
-      qs(page,'#compareTbody').innerHTML = rows.map(r =>
-        `<tr><td>${r[0]}</td><td class="${r[3]===a.name?'winner':''}">${r[1]}</td><td class="${r[3]===b.name?'winner':''}">${r[2]}</td><td>${r[3]}</td></tr>`
-      ).join('');
+      renderCompareRows(qs(page,'#compareTbody'), rows, a.name, b.name);
 
       const diff = sa.total - sb.total;
       let verdict, body;
@@ -646,9 +689,7 @@
           ['Overall safety score', Math.round(sa.total)+'/100', Math.round(sb.total)+'/100', Math.abs(sa.total-sb.total)<5?'Tied':(sa.total>sb.total?a.name:b.name)]
         ];
 
-        qs(page,'#compareTbody').innerHTML = rows.map(r =>
-          `<tr><td>${r[0]}</td><td class="${r[3]===a.name?'winner':''}">${r[1]}</td><td class="${r[3]===b.name?'winner':''}">${r[2]}</td><td>${r[3]}</td></tr>`
-        ).join('');
+        renderCompareRows(qs(page,'#compareTbody'), rows, a.name, b.name);
 
         const diff = sa.total - sb.total;
         let verdict, body;
