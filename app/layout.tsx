@@ -68,7 +68,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Script id="org-jsonld" nonce={nonce} type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify(orgJsonLd)}
         </Script>
-        <Script nonce={nonce} src="/dharma-tools.js" strategy="afterInteractive" />
       </body>
     </html>
   );
