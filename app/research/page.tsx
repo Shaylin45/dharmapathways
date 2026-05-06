@@ -65,14 +65,14 @@ export default function Page() {
             <strong>Data currency note:</strong> thresholds, fee ranges, funding rules and labour-market signals change. Each assumption should be re-checked before major public campaigns, school partnerships or paid advisory work. Users should verify all figures directly before applying or borrowing.
           </div>
 
-          <div className="warning-box" style={{ marginTop: 'var(--space-8)' }}>
+          <div className="warning-box section-gap-top">
             <strong>⚠ Damelin / Educor regulatory status — verify before applying</strong>
             In January 2026, DHET issued a Notice of Intent to Cancel Damelin’s private higher education registration. The Council on Higher Education has also recommended the withdrawal of Damelin qualifications from the HEQC register. These proceedings were ongoing as of May 2026. Users should verify current registration status directly with DHET, CHE and SAQA before applying, enrolling or paying deposits. Date checked: May 2026.
           </div>
 
-          <div style={{ marginTop: 'var(--space-8)' }}>
+          <div className="section-stack">
             {frameworks.map((item, index) => (
-              <div key={item.title} style={index === 0 ? undefined : { marginTop: 'var(--space-8)' }}>
+              <div key={item.title} className={index === 0 ? undefined : "section-gap-top"}>
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
               </div>
@@ -81,16 +81,16 @@ export default function Page() {
         </div>
       </section>
 
-      <section style={{ background: 'var(--paper-deep)' }}>
+      <section className="section-paper-deep">
         <div className="container container-narrow">
           <span className="eyebrow">Reference list</span>
           <h2>Where to verify our framing.</h2>
-          <p style={{ marginTop: 'var(--space-6)' }}>
+          <p className="lead-space-sm">
             These links are starting points for verification, not endorsements. Before applying, borrowing or paying fees, confirm the current rule or figure directly with the relevant official body.
           </p>
-          <ul style={{ listStyle: 'none', marginTop: 'var(--space-6)', borderTop: '1px solid var(--line)' }}>
+          <ul className="reference-list">
             {references.map(([label, body, href, hrefLabel]) => (
-              <li key={label} style={{ padding: 'var(--space-4) 0', borderBottom: '1px solid var(--line)' }}>
+              <li key={label} className="reference-list-item">
                 <strong>{label}</strong> — {body} ·{' '}
                 <a href={href} rel={href.startsWith('http') ? 'noopener' : undefined} target={href.startsWith('http') ? '_blank' : undefined}>
                   {hrefLabel}

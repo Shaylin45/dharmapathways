@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import './globals.css';
 import Navigation from '@/components/Navigation';
@@ -47,7 +48,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   const orgJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -64,19 +66,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <Footer />
 
-        <Script id="org-jsonld" type="application/ld+json" strategy="afterInteractive">
+        <Script id="org-jsonld" nonce={nonce} type="application/ld+json" strategy="afterInteractive">
           {JSON.stringify(orgJsonLd)}
         </Script>
 
         {cfBeaconToken ? (
           <Script
+            nonce={nonce}
             src="https://static.cloudflareinsights.com/beacon.min.js"
             strategy="afterInteractive"
             data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
           />
         ) : null}
 
-        <Script src="/dharma-tools.js" strategy="afterInteractive" />
+        <Script nonce={nonce} src="/dharma-tools.js" strategy="afterInteractive" />
       </body>
     </html>
   );

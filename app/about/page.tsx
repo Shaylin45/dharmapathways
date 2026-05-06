@@ -77,7 +77,7 @@ export default function Page() {
 
       <hr className="divider" />
 
-      <section style={{ paddingTop: 0 }}>
+      <section className="section-pt-0">
         <div className="container">
           <div className="two-col">
             <div>
@@ -85,7 +85,7 @@ export default function Page() {
               <h2>What we are trying to do.</h2>
             </div>
             <div>
-              <p style={{ fontSize: '1.15rem', color: 'var(--ink)' }}>
+              <p className="intro-emphasis">
                 Help every South African family — especially those in the missing middle — make post-school education decisions with full information, honest maths, and zero conflicts of interest.
               </p>
               <p>That means free tools that work without you signing up. Numbers that come from public, citable sources. Comparisons that include TVET, distance learning, work-then-study, and gap years with purpose.</p>
@@ -94,10 +94,10 @@ export default function Page() {
         </div>
       </section>
 
-      <section style={{ background: 'var(--paper-deep)' }}>
+      <section className="section-paper-deep">
         <div className="container">
           <span className="eyebrow">How we work</span>
-          <h2 style={{ maxWidth: '22ch' }}>Six commitments we hold ourselves to.</h2>
+          <h2 className="max-ch-22">Six commitments we hold ourselves to.</h2>
           <div className="value-grid">
             {values.map(([title, body]) => (
               <div className="value-item reveal" key={title}>
@@ -112,7 +112,7 @@ export default function Page() {
       <section>
         <div className="container">
           <span className="eyebrow">The team</span>
-          <h2 style={{ maxWidth: '26ch' }}>Built by people who lived the problem.</h2>
+          <h2 className="max-ch-26">Built by people who lived the problem.</h2>
           <div className="team-grid">
             {team.map((member) => (
               <div className="team-card reveal" key={member.name}>

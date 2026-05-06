@@ -813,7 +813,7 @@ export function CareerFitCheck() {
                     <option value="90">Strong first-hand exposure</option>
                   </select>
                 </div>
-                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                <div className="form-group form-group-full">
                   <label htmlFor="fit-dream-route">Dream route to pressure-test</label>
                   <select id="fit-dream-route" value={form.dreamRoute} onChange={(event) => { setForm((current) => ({ ...current, dreamRoute: event.target.value as DreamRoute })); setResult(null); }}>
                     {Object.entries(dreamRouteLibrary).map(([key, value]) => <option key={key} value={key}>{value.label}</option>)}
@@ -845,7 +845,7 @@ export function CareerFitCheck() {
 
           {result && (
             <div className="result-panel" ref={resultRef}>
-              <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>Your career fit</span>
+              <span className="eyebrow eyebrow-soft">Your career fit</span>
               <div className={`verdict ${result.verdictClass}`}>{result.verdict}</div>
               <p>{result.verdictBody}</p>
               <div className="career-list">
@@ -869,7 +869,7 @@ export function CareerFitCheck() {
                 </div>
               </div>
 
-              <h4 style={{ margin: 'var(--space-8) 0 var(--space-3)' }}>A few honest notes</h4>
+              <h4 className="result-subheading">A few honest notes</h4>
               <ul>{result.implications.map((item) => <li key={item}>{item}</li>)}</ul>
 
               <div className="next-steps">

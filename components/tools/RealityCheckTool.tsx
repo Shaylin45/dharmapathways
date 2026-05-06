@@ -630,12 +630,12 @@ export default function RealityCheckTool() {
             <span className="eyebrow">Live preview</span>
             <h3>{preview.pressureBand}: {preview.pressureScore}/100 pressure score</h3>
             <p>{pressureMeta[preview.pressure].action}</p>
-            <div className="pressure-meter"><span style={{ width: `${preview.pressureScore}%` }} /></div>
+            <progress className="pressure-meter" max={100} value={preview.pressureScore} />
           </div>
 
           {result ? (
             <div className="result-panel" ref={resultRef}>
-              <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>Your Missing Middle Reality Check</span>
+              <span className="eyebrow eyebrow-soft">Your Missing Middle Reality Check</span>
               <div className={`verdict ${meta.cls}`}>{meta.verdict}</div>
               <p>{meta.meaning}</p>
 
@@ -653,21 +653,21 @@ export default function RealityCheckTool() {
                 <p><strong>Study-cost reality:</strong> {result.routeSafety}</p>
               </div>
 
-              <h4 style={{ marginTop: 'var(--space-8)', marginBottom: 'var(--space-3)' }}>Pressure dimensions</h4>
+              <h4 className="result-subheading">Pressure dimensions</h4>
               <div className="dimension-grid">
                 {result.dimensions.map((dimension) => (
                   <div className="dimension-card" key={dimension.key}>
                     <div className="dimension-top"><strong>{dimension.label}</strong><span>{dimension.raw}/100</span></div>
-                    <div className="dimension-bar"><span style={{ width: `${dimension.raw}%` }} /></div>
+                    <progress className="dimension-bar" max={100} value={dimension.raw} />
                     <p>{dimension.explanation}</p>
                   </div>
                 ))}
               </div>
 
-              <h4 style={{ marginTop: 'var(--space-8)', marginBottom: 'var(--space-3)' }}>Top pressure drivers</h4>
+              <h4 className="result-subheading">Top pressure drivers</h4>
               <ul>{result.drivers.map((driver) => <li key={driver}>{driver}</li>)}</ul>
 
-              <h4 style={{ marginTop: 'var(--space-8)', marginBottom: 'var(--space-3)' }}>Recommended next actions</h4>
+              <h4 className="result-subheading">Recommended next actions</h4>
               <ol className="result-ordered-list">{result.nextActions.map((action) => <li key={action}>{action}</li>)}</ol>
 
               <div className="next-steps">

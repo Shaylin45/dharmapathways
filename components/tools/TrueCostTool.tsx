@@ -621,7 +621,7 @@ export function TrueCostTool() {
 
           {showResult ? (
             <div className="result-panel" ref={resultRef}>
-              <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>Your true cost</span>
+              <span className="eyebrow eyebrow-soft">Your true cost</span>
               <div className={`verdict ${bandClass(result.band)}`}>{result.verdict}</div>
               <p>{result.verdictBody}</p>
 
@@ -648,7 +648,7 @@ export function TrueCostTool() {
                 </div>
               </div>
 
-              <h4 style={{ marginBottom: 'var(--space-3)' }}>What this means</h4>
+              <h4 className="result-subheading-tight">What this means</h4>
               <ul>{result.implications.map((item) => <li key={item}>{item}</li>)}</ul>
 
               <div className="residence-risk">

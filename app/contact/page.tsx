@@ -32,22 +32,12 @@ export default function Page() {
         </div>
       </section>
 
-      <section style={{ paddingTop: 'var(--space-12)' }}>
+      <section className="section-top-tight">
         <div className="container container-narrow">
-          <div className="form-section" style={{ textAlign: 'center', padding: 'var(--space-16) var(--space-8)' }}>
+          <div className="form-section contact-hero-card">
             <span className="eyebrow">Write to us at</span>
-            <h2
-              style={{
-                fontFamily: 'var(--display)',
-                fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
-                margin: 'var(--space-4) 0 var(--space-8)',
-                wordBreak: 'break-all',
-              }}
-            >
-              <a
-                href="mailto:info@dharmapathways.org.za"
-                style={{ textDecoration: 'none', color: 'var(--ink)', borderBottom: '2px solid var(--terracotta)', paddingBottom: 4 }}
-              >
+            <h2 className="contact-email-heading">
+              <a href="mailto:info@dharmapathways.org.za" className="contact-email-link">
                 info@dharmapathways.org.za
               </a>
             </h2>
@@ -56,9 +46,9 @@ export default function Page() {
             </a>
           </div>
 
-          <div className="form-section" style={{ marginTop: 'var(--space-8)' }}>
+          <div className="form-section section-gap-top">
             <h3>Useful subject lines</h3>
-            <ul style={{ paddingLeft: '1.5rem', color: 'var(--ink-soft)', lineHeight: 1.9, marginTop: 'var(--space-4)' }}>
+            <ul className="content-list contact-subject-list">
               {subjects.map((subject) => (
                 <li key={subject.href}>
                   <a href={subject.href}>{subject.label}</a> — {subject.body}

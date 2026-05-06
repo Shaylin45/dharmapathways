@@ -717,9 +717,9 @@ export function RouteCompareTool() {
 
       <section className="tool-body">
         <div className="container">
-          <div className="form-section" style={{ marginBottom: 'var(--space-8)' }}>
+          <div className="form-section route-template-section">
             <span className="eyebrow">Route templates</span>
-            <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.25rem)' }}>Not sure what to compare? Start here.</h2>
+            <h2 className="route-template-title">Not sure what to compare? Start here.</h2>
             <p className="helper">Choose a common South African study comparison to pre-fill the form. The estimates are conservative starting points, not recommendations.</p>
             <div className="template-grid">
               {templates.map((template) => (
@@ -757,7 +757,7 @@ export function RouteCompareTool() {
               <strong>Employment signal is not a promise.</strong> We suggest a starting score using South African labour-market signals and route characteristics. Adjust only when you have stronger evidence about the provider, employer link, placement rate, registration path or graduate outcomes.
             </div>
 
-            <div className="form-actions" style={{ justifyContent: 'center' }}>
+            <div className="form-actions form-actions-center">
               <button className="btn btn-primary" type="submit">Compare these routes →</button>
               <button className="btn btn-ghost" type="button" onClick={resetRoutes}>Reset</button>
             </div>
@@ -765,7 +765,7 @@ export function RouteCompareTool() {
 
           {result && (
             <div className="result-panel" ref={resultRef}>
-              <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>Comparison verdict</span>
+              <span className="eyebrow eyebrow-soft">Comparison verdict</span>
               <div className={`verdict ${Math.abs(result.sa.total - result.sb.total) < 5 ? 'amber' : 'green'}`}>{result.verdict}</div>
               <p>{result.verdictBody}</p>
               <ResultTable result={result} />
@@ -788,7 +788,7 @@ export function RouteCompareTool() {
                 })}
               </div>
 
-              <h4 style={{ margin: 'var(--space-8) 0 var(--space-3)' }}>Things worth thinking about</h4>
+              <h4 className="result-subheading">Things worth thinking about</h4>
               <ul>{result.implications.map((item) => <li key={item}>{item}</li>)}</ul>
 
               <div className="next-steps">

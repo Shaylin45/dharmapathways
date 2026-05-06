@@ -40,13 +40,13 @@ export default function Page() {
         </div>
       </section>
 
-      <section style={{ paddingTop: 'var(--space-12)' }}>
+      <section className="section-top-tight">
         <div className="container">
           <div className="snapshot-panel" id="pathwaySnapshot">
-            <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>
+            <span className="eyebrow eyebrow-soft">
               Your Pathway Snapshot
             </span>
-            <h2 style={{ fontSize: 'clamp(1.7rem, 3vw, 2.35rem)' }}>Your current decision profile</h2>
+            <h2 className="tools-snapshot-title">Your current decision profile</h2>
             <p>This snapshot updates as your household completes the tools. No tools completed yet? Start with Reality Check to build the first part of your snapshot.</p>
             <div className="snapshot-grid" id="snapshotGrid"></div>
             <div className="snapshot-action" id="snapshotAction">
@@ -54,7 +54,7 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="tools-grid" style={{ marginTop: 'var(--space-12)' }}>
+          <div className="tools-grid section-gap-top">
             {tools.map((tool) => (
               <a className="tool-card reveal" href={tool.href} key={tool.title}>
                 <div className="tool-card-num">{tool.step}</div>
@@ -64,24 +64,15 @@ export default function Page() {
               </a>
             ))}
 
-            <a
-              className="tool-card reveal"
-              href="/tools/next-steps"
-              style={{
-                gridColumn: '1 / -1',
-                background: 'var(--ink)',
-                color: 'var(--paper)',
-                borderColor: 'var(--terracotta)',
-              }}
-            >
-              <div className="tool-card-num" style={{ color: 'var(--terracotta-soft)' }}>
+            <a className="tool-card tool-card-featured reveal" href="/tools/next-steps">
+              <div className="tool-card-num">
                 — After all four · 5 minutes
               </div>
-              <h3 style={{ color: 'var(--paper)' }}>What Comes Next — three pathways, three priorities</h3>
-              <p style={{ color: 'rgba(250,247,242,0.85)' }}>
+              <h3>What Comes Next — three pathways, three priorities</h3>
+              <p>
                 Cheapest, most employable, and fastest to earning — cross-referenced against South African labour-market signals.
               </p>
-              <span className="tool-card-arrow" style={{ color: 'var(--terracotta-soft)' }}>
+              <span className="tool-card-arrow">
                 See your pathways →
               </span>
             </a>

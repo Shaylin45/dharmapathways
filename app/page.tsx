@@ -122,7 +122,7 @@ export default function Page() {
               <h1>
                 Choosing what to study <span className="accent">shouldn&apos;t</span> bankrupt your family.
               </h1>
-              <p className="lead" style={{ marginTop: '1.5rem' }}>
+              <p className="lead lead-space-top">
                 You earn too much for NSFAS, too little for university to feel safe. Dharma Pathways gives you four free tools to weigh the real cost, the real risk, and the real fit of every post-school path — before you commit.
               </p>
               <div className="beta-notice">
@@ -163,18 +163,18 @@ export default function Page() {
         <div className="container container-narrow">
           <span className="eyebrow">Why this exists</span>
           <h2>The advice you are given assumes you can either pay full price or qualify for full funding. Most families can do neither.</h2>
-          <p style={{ marginTop: '1.5rem' }}>
+          <p className="copy-space-top">
             If your household earns roughly R 350,000 to R 600,000 a year, you are caught in the gap. Bursary applications screen you out. Banks happily offer student loans you will struggle to repay. School counsellors steer everyone toward the same three universities. Meanwhile, no one tells you what an Honours actually costs once you add accommodation, data, and a working laptop — or that a TVET pathway might earn more, sooner, with less debt.
           </p>
           <p>Dharma Pathways was built to fill that gap with honest numbers and clear comparisons. No institution pays us. No referral fees. No hidden agenda.</p>
         </div>
       </section>
 
-      <section style={{ background: 'var(--paper-deep)' }}>
+      <section className="section-paper-deep">
         <div className="container">
           <span className="eyebrow">How to use Dharma Pathways</span>
-          <h2 style={{ maxWidth: '24ch' }}>Start with the question you actually have.</h2>
-          <p className="lead" style={{ marginTop: '1rem' }}>
+          <h2 className="max-ch-24">Start with the question you actually have.</h2>
+          <p className="lead lead-space-sm">
             You do not need to understand the whole education system before using the site. Pick the entry point that sounds most like you.
           </p>
           <div className="journey-grid">
@@ -208,8 +208,8 @@ export default function Page() {
       <section>
         <div className="container">
           <span className="eyebrow">Four tools, one decision</span>
-          <h2 style={{ maxWidth: '18ch' }}>A guided sequence — not another brochure.</h2>
-          <p className="lead" style={{ marginTop: '1rem' }}>
+          <h2 className="max-ch-18">A guided sequence — not another brochure.</h2>
+          <p className="lead lead-space-sm">
             Each tool builds on the last. Use them in order for the strongest report, or jump to the question keeping you up at night.
           </p>
           <div className="tools-grid">
@@ -228,17 +228,13 @@ export default function Page() {
       <section className="early-users">
         <div className="container">
           <span className="eyebrow">What early users found</span>
-          <h2 style={{ maxWidth: '22ch' }}>Ten families. Five recurring moments of &quot;oh — we hadn&apos;t thought about that.&quot;</h2>
+          <h2 className="max-ch-22">Ten families. Five recurring moments of &quot;oh — we hadn&apos;t thought about that.&quot;</h2>
           <div className="early-users-disclosure">
             <strong>Honest disclosure:</strong> Dharma Pathways was tested with ten South African families before public launch — including the founders&apos; own families and close relatives. As we collect named feedback from public users, we will publish that too.
           </div>
           <div className="early-users-grid">
             {insights.map((quote, index) => (
-              <div
-                className="insight reveal"
-                key={quote}
-                style={index === insights.length - 1 ? { gridColumn: '1 / -1', maxWidth: '60ch' } : undefined}
-              >
+              <div className={`insight reveal${index === insights.length - 1 ? ' insight-full' : ''}`} key={quote}>
                 <div className="insight-num">— {String(index + 1).padStart(2, '0')}</div>
                 <p className="insight-quote">{quote}</p>
                 <p className="insight-attr">— recurring feedback from early users</p>
@@ -248,58 +244,36 @@ export default function Page() {
         </div>
       </section>
 
-      <section style={{ background: 'var(--ink)', color: 'var(--paper)', padding: 'var(--space-12) 0' }}>
+      <section className="section-ink-band">
         <div className="container container-narrow">
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'auto 1fr',
-              gap: 'var(--space-8)',
-              alignItems: 'center',
-            }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--display)',
-                fontSize: 'clamp(3.5rem, 9vw, 6rem)',
-                fontWeight: 400,
-                color: 'var(--terracotta-soft)',
-                lineHeight: 1,
-              }}
-            >
+          <div className="signal-grid">
+            <div className="signal-stat">
               51.7%
             </div>
             <div>
-              <p
-                style={{
-                  color: 'rgba(250,247,242,0.92)',
-                  fontSize: '1.15rem',
-                  marginBottom: '0.5rem',
-                  lineHeight: 1.4,
-                }}
-              >
+              <p className="signal-copy">
                 of South African workers are in jobs that do not match their qualifications.
               </p>
-              <p style={{ color: 'rgba(250,247,242,0.6)', fontSize: '0.85rem', fontStyle: 'italic', margin: 0 }}>
+              <p className="signal-source">
                 — DHET 2024 National List of Occupations in High Demand
               </p>
             </div>
           </div>
-          <p style={{ color: 'rgba(250,247,242,0.78)', marginTop: 'var(--space-6)', fontSize: '1rem' }}>
+          <p className="signal-summary">
             A generation of South Africans studied something that did not lead where they hoped. Our tools cross-reference what you would thrive at against what the country actually needs.
           </p>
-          <p style={{ marginTop: 'var(--space-6)' }}>
-            <a href="/tools/next-steps" style={{ color: 'var(--terracotta-soft)', fontWeight: 600 }}>
+          <p className="signal-link-row">
+            <a href="/tools/next-steps" className="signal-link">
               See the three-pathway recommendations engine →
             </a>
           </p>
         </div>
       </section>
 
-      <section style={{ background: 'var(--paper-deep)' }}>
+      <section className="section-paper-deep">
         <div className="container">
           <span className="eyebrow">The Dharma method</span>
-          <h2 style={{ maxWidth: '22ch' }}>From &quot;I have no idea&quot; to &quot;I know exactly why I chose this.&quot;</h2>
+          <h2 className="max-ch-22">From &quot;I have no idea&quot; to &quot;I know exactly why I chose this.&quot;</h2>
           <div className="steps">
             {methodSteps.map((step, index) => (
               <div className="step reveal" key={step.title}>
@@ -313,12 +287,12 @@ export default function Page() {
       </section>
 
       <section>
-        <div className="container container-narrow" style={{ textAlign: 'center' }}>
+        <div className="container container-narrow centered-stack">
           <span className="eyebrow">A note on independence</span>
-          <h2 style={{ fontSize: '1.75rem', maxWidth: '30ch', margin: '0 auto' }}>
+          <h2 className="centered-heading">
             We take no money from universities, colleges, lenders, or bursary providers.
           </h2>
-          <p className="lead" style={{ margin: '1.5rem auto 2rem', textAlign: 'left' }}>
+          <p className="lead centered-lead-left">
             Most &quot;free&quot; education advice in South Africa is paid for by the institutions you are being advised toward. Dharma Pathways is built independently and the tools are free to use.
           </p>
           <a className="btn btn-ghost" href="/about">
@@ -332,8 +306,8 @@ export default function Page() {
           <div className="feedback-grid">
             <div>
               <span className="eyebrow">Help us improve</span>
-              <h2 style={{ fontSize: 'clamp(1.7rem, 3vw, 2.4rem)' }}>Testing the tools? Tell us what confused you.</h2>
-              <p style={{ marginTop: 'var(--space-4)', maxWidth: '60ch' }}>
+              <h2 className="feedback-heading">Testing the tools? Tell us what confused you.</h2>
+              <p className="feedback-copy">
                 Dharma Pathways is still improving. We especially want to know which result felt unclear, which route you wished we covered, and whether any wording felt unfair or judgemental.
               </p>
             </div>

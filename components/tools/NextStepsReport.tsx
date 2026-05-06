@@ -1216,17 +1216,17 @@ export function NextStepsReport() {
         </div>
       </section>
 
-      <section style={{ background: 'var(--ink)', color: 'var(--paper)', padding: 'var(--space-12) 0' }}>
+      <section className="nextsteps-hero-band">
         <div className="container container-narrow">
-          <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 'var(--space-8)', alignItems: 'center' }}>
-            <div style={{ fontFamily: 'var(--display)', fontSize: 'clamp(3rem, 8vw, 5rem)', fontWeight: 400, color: 'var(--terracotta-soft)', lineHeight: 1 }}>
+          <div className="nextsteps-hero-grid">
+            <div className="nextsteps-hero-count">
               {completionCount}/4
             </div>
             <div>
-              <p style={{ color: 'rgba(250,247,242,0.92)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+              <p className="nextsteps-hero-copy">
                 tools are feeding this decision brief right now.
               </p>
-              <p style={{ color: 'rgba(250,247,242,0.64)', fontSize: '0.9rem', margin: 0 }}>
+              <p className="nextsteps-hero-note">
                 The goal here is not false certainty. It is a calmer, better-informed commitment decision before any money moves.
               </p>
             </div>
@@ -1237,14 +1237,14 @@ export function NextStepsReport() {
       <section className="tool-body">
         <div className="container">
           {!reality && !cost && !fit && !compare ? (
-            <div className="form-section" style={{ textAlign: 'center', padding: 'var(--space-16) var(--space-8)' }}>
+            <div className="form-section nextsteps-empty-state">
               <span className="eyebrow">Nothing saved yet</span>
-              <h2 style={{ maxWidth: '28ch', margin: 'var(--space-4) auto' }}>Run the first tools, then come back here for the final decision brief.</h2>
-              <p style={{ maxWidth: '54ch', margin: '0 auto var(--space-8)' }}>
+              <h2 className="nextsteps-empty-title">Run the first tools, then come back here for the final decision brief.</h2>
+              <p className="nextsteps-empty-copy">
                 This page becomes useful once the household has at least started Reality Check and True Cost. Career Fit and Route Compare
                 turn it into a much stronger final decision layer.
               </p>
-              <div className="form-actions" style={{ justifyContent: 'center' }}>
+              <div className="form-actions form-actions-center">
                 <a className="btn btn-primary" href="/tools/reality-check">
                   Start with Reality Check
                 </a>
@@ -1257,8 +1257,8 @@ export function NextStepsReport() {
             <div className="report-stack">
               <div className="form-section">
                 <span className="eyebrow">Completion map</span>
-                <h2 style={{ marginBottom: 'var(--space-4)' }}>What this report already knows</h2>
-                <p className="helper" style={{ marginBottom: 'var(--space-6)' }}>
+                <h2 className="section-heading-gap">What this report already knows</h2>
+                <p className="helper helper-gap">
                   Tool 5 should still be helpful when only some tools are complete. It upgrades from pressure snapshot to full decision brief as more data arrives.
                 </p>
 
@@ -1288,13 +1288,13 @@ export function NextStepsReport() {
                 {partial ? (
                   <div className="snapshot-action">
                     <strong>Recommended next action:</strong> {nextAction}
-                    <p style={{ marginTop: '0.65rem', marginBottom: 0 }}>{partial}</p>
+                    <p className="snapshot-note">{partial}</p>
                   </div>
                 ) : null}
               </div>
 
               <div className="snapshot-panel">
-                <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>
+                <span className="eyebrow eyebrow-soft">
                   Pathway snapshot
                 </span>
                 <h2>Your current decision profile</h2>
@@ -1355,12 +1355,12 @@ export function NextStepsReport() {
               <div className="form-section">
                 <span className="eyebrow">Risk notes</span>
                 <h3>Before anyone commits money</h3>
-                <ul style={{ paddingLeft: '1.5rem', color: 'var(--ink-soft)', lineHeight: 1.8, marginTop: 'var(--space-4)' }}>
+                <ul className="report-warning-list">
                   {warnings.map((warning) => (
                     <li key={warning}>{warning}</li>
                   ))}
                 </ul>
-                <p style={{ marginTop: 'var(--space-6)', color: 'var(--ink-mute)', fontSize: '0.92rem' }}>
+                <p className="report-muted-note">
                   This report is decision support, not a substitute for direct verification with institutions, funders or professional bodies.
                 </p>
               </div>
@@ -1371,8 +1371,8 @@ export function NextStepsReport() {
                   <h3>What Tool 3 currently suggests</h3>
                   <div className="tool-compare">
                     <div>
-                      <h4 style={{ marginBottom: 'var(--space-3)' }}>{compareSummary.winner?.name ?? 'Winning route'}</h4>
-                      <p style={{ marginBottom: 'var(--space-4)' }}>{compareSummary.note}</p>
+                      <h4 className="compare-winner-title">{compareSummary.winner?.name ?? 'Winning route'}</h4>
+                      <p className="compare-note">{compareSummary.note}</p>
                       <div className="pathway-facts">
                         <div>
                           <div className="pathway-fact-label">Employment signal</div>
@@ -1392,16 +1392,16 @@ export function NextStepsReport() {
                       </p>
                     </div>
                     <div>
-                      <div className="warning-box" style={{ margin: 0 }}>
+                      <div className="warning-box warning-box-reset">
                         <strong>Check before paying</strong>
                         {compareSummary.riskFlags.length ? (
-                          <ul style={{ paddingLeft: '1.2rem', marginTop: '0.75rem' }}>
+                          <ul className="warning-list-compact">
                             {compareSummary.riskFlags.map((flag) => (
                               <li key={flag}>{flag}</li>
                             ))}
                           </ul>
                         ) : (
-                          <p style={{ marginTop: '0.75rem' }}>No major compare-specific warning was triggered, but costs, accreditation and placement still need direct confirmation.</p>
+                          <p className="warning-copy-top">No major compare-specific warning was triggered, but costs, accreditation and placement still need direct confirmation.</p>
                         )}
                       </div>
                     </div>
@@ -1418,10 +1418,10 @@ export function NextStepsReport() {
                   </p>
 
                   {recommendations.map((recommendation, index) => (
-                    <section key={recommendation.title} style={{ marginTop: index === 0 ? 0 : 'var(--space-12)' }}>
+                    <section key={recommendation.title} className="recommendation-section">
                       <span className="eyebrow">Match #{index + 1}</span>
-                      <h2 style={{ marginBottom: 'var(--space-4)' }}>{recommendation.title}</h2>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-6)' }}>
+                      <h2 className="recommendation-section-title">{recommendation.title}</h2>
+                      <div className="recommendation-facts">
                         <div>
                           <div className="pathway-fact-label">Overall match</div>
                           <div className="pathway-fact-value">{recommendation.match}%</div>
@@ -1439,7 +1439,7 @@ export function NextStepsReport() {
                       {recommendation.readinessNotes.length ? (
                         <div className="warning-box">
                           <strong>Readiness notes</strong>
-                          <ul style={{ paddingLeft: '1.2rem', marginTop: '0.75rem' }}>
+                          <ul className="warning-list-compact">
                             {recommendation.readinessNotes.map((note) => (
                               <li key={note}>{note}</li>
                             ))}
@@ -1472,8 +1472,8 @@ export function NextStepsReport() {
                         <p>
                           <strong>Trade-offs:</strong> {recommendation.primary.tradeoffs}
                         </p>
-                        <p style={{ margin: 0 }}>
-                          <strong style={{ color: 'var(--terracotta)' }}>What to check this week:</strong> {recommendation.thisWeek}
+                        <p className="paragraph-reset">
+                          <strong className="terracotta-strong">What to check this week:</strong> {recommendation.thisWeek}
                         </p>
                       </div>
 
@@ -1483,7 +1483,7 @@ export function NextStepsReport() {
                             <div className="pathway-label">Also compare</div>
                             <h3>{option.title}</h3>
                             <p>{option.summary}</p>
-                            <p style={{ margin: 0 }}>
+                            <p className="paragraph-reset">
                               <strong>Why it matters:</strong> {option.tradeoffs}
                             </p>
                           </div>
@@ -1510,7 +1510,7 @@ export function NextStepsReport() {
                 <div className="alternative-finder">
                   <span className="eyebrow">Safer routes to compare</span>
                   <h3>{fit?.dream?.label ?? 'Dream route'} may still be valid. These are simply safer routes to investigate before committing money, debt or accommodation.</h3>
-                  {fit?.dream?.note ? <p className="helper" style={{ marginTop: 'var(--space-3)' }}>{fit.dream.note}</p> : null}
+                  {fit?.dream?.note ? <p className="helper helper-top-gap">{fit.dream.note}</p> : null}
                   <div className="alternative-grid">
                     {saferRoutes.slice(0, 3).map((route) => (
                       <div key={route.title} className="alternative-card">
@@ -1522,7 +1522,7 @@ export function NextStepsReport() {
                         <p>
                           <strong>Typical route:</strong> {route.route}
                         </p>
-                        <p style={{ margin: 0 }}>
+                        <p className="paragraph-reset">
                           <strong>What to ask next:</strong> {route.next}
                         </p>
                       </div>
@@ -1555,7 +1555,7 @@ export function NextStepsReport() {
                   {cost.topDrivers?.length ? (
                     <>
                       <h4>Biggest cost drivers</h4>
-                      <ul style={{ paddingLeft: '1.2rem' }}>
+                      <ul className="report-list-compact">
                         {cost.topDrivers.slice(0, 5).map((driver) => (
                           <li key={driver.label}>
                             {driver.label}: {formatR(driver.amount)} ({Math.round(driver.share)}% of the recurring cost)
@@ -1567,8 +1567,8 @@ export function NextStepsReport() {
 
                   {cost.saferLevers?.length ? (
                     <>
-                      <h4 style={{ marginTop: 'var(--space-6)' }}>Levers that could reduce pressure</h4>
-                      <ul style={{ paddingLeft: '1.2rem' }}>
+                      <h4 className="report-subheading-top">Levers that could reduce pressure</h4>
+                      <ul className="report-list-compact">
                         {cost.saferLevers.slice(0, 5).map((lever) => (
                           <li key={lever}>{lever}</li>
                         ))}
@@ -1612,7 +1612,7 @@ export function NextStepsReport() {
               ) : null}
 
               <div className="result-panel">
-                <span className="eyebrow" style={{ color: 'var(--terracotta-soft)' }}>
+                <span className="eyebrow eyebrow-soft">
                   Final decision layer
                 </span>
                 <div className={`verdict ${topRecommendation ? readinessTone(topRecommendation.readinessScore) : 'amber'}`}>
@@ -1627,10 +1627,10 @@ export function NextStepsReport() {
                 <div className="question-generator">
                   <span className="eyebrow">Questions to ask this week</span>
                   <h3>Use these questions before any payment or application decision</h3>
-                  <div className="question-output" style={{ display: 'block' }}>
-                    <ol style={{ paddingLeft: '1.2rem', margin: 0 }}>
+                  <div className="question-output question-output-block">
+                    <ol className="question-list">
                       {questionList.map((question) => (
-                        <li key={question} style={{ marginBottom: '0.55rem' }}>
+                        <li key={question}>
                           {question}
                         </li>
                       ))}
@@ -1680,7 +1680,7 @@ export function NextStepsReport() {
                       </ul>
                     </div>
                   </div>
-                  <p style={{ marginTop: 'var(--space-6)', color: 'rgba(250,247,242,0.72)', fontSize: '0.92rem' }}>
+                  <p className="conversation-muted">
                     A good decision is not the one that sounds most impressive. It is the one the family can carry and the student can finish with dignity.
                   </p>
                 </div>
