@@ -23,6 +23,40 @@
         ul.appendChild(li);
       });
     }
+    function createEl(tag, options = {}, children = []) {
+      const node = document.createElement(tag);
+      if (options.className) node.className = options.className;
+      if (options.id) node.id = options.id;
+      if (options.text != null) node.textContent = options.text;
+      if (options.htmlFor) node.htmlFor = options.htmlFor;
+      if (options.href) node.href = options.href;
+      if (options.type) node.type = options.type;
+      if (options.value != null) node.value = options.value;
+      if (options.attrs) Object.entries(options.attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      if (options.dataset) Object.entries(options.dataset).forEach(([key, value]) => { node.dataset[key] = value; });
+      const list = Array.isArray(children) ? children : [children];
+      list.filter(child => child != null).forEach((child) => {
+        node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+      });
+      return node;
+    }
+    function createStrongParagraph(label, text, className = '') {
+      const p = createEl('p', { className });
+      p.appendChild(createEl('strong', { text: label }));
+      if (text) p.appendChild(document.createTextNode(' ' + text));
+      return p;
+    }
+    function createFactBlock(label, value) {
+      return createEl('div', {}, [
+        createEl('div', { className: 'pathway-fact-label', text: label }),
+        createEl('div', { className: 'pathway-fact-value', text: value }),
+      ]);
+    }
+    function createListElement(items, className = '') {
+      const list = createEl('ul', { className });
+      items.forEach((item) => list.appendChild(createEl('li', { text: item })));
+      return list;
+    }
     function titleCase(t) { return t ? t.charAt(0).toUpperCase() + t.slice(1) : ''; }
 
 
@@ -772,7 +806,12 @@
       const focus = top.find(c => c.readinessScore < 75) || top[0];
       if (!focus) return;
       const steps = buildReadinessSteps(focus);
-      plan.innerHTML = `<span class="plan-tag">Readiness improvement plan</span><h4>${focus.title}: how to make this route safer</h4><p>Your fit result should not only warn you about subject or mark gaps. Use this plan to find a safer entry route before committing to a high-cost option.</p><ul>${steps.map(step => `<li>${step}</li>`).join('')}</ul>`;
+      plan.replaceChildren(
+        createEl('span', { className: 'plan-tag', text: 'Readiness improvement plan' }),
+        createEl('h4', { text: focus.title + ': how to make this route safer' }),
+        createEl('p', { text: 'Your fit result should not only warn you about subject or mark gaps. Use this plan to find a safer entry route before committing to a high-cost option.' }),
+        createListElement(steps)
+      );
       plan.classList.remove('hidden');
     }
 
@@ -830,6 +869,26 @@
       return { math:'Maths', science:'Physical Sciences', english:'English', accounting:'Accounting/Business', lifeScience:'Life Sciences', overall:'Overall average' }[key] || key;
     }
 
+    function createCareerListItem(career) {
+      const item = createEl('div', { className: 'career-item' });
+      item.appendChild(createEl('div', {
+        className: 'match',
+        text: career.match + '% overall match · ' + career.fitScore + '% fit · ' + career.readinessScore + '% readiness'
+      }));
+      item.appendChild(createEl('h4', { text: career.title }));
+      item.appendChild(createEl('p', { text: career.blurb }));
+      item.appendChild(createStrongParagraph('Typical routes in SA:', career.routes, 'career-item-detail'));
+      if (career.readinessNotes && career.readinessNotes.length) {
+        item.appendChild(createListElement(career.readinessNotes, 'career-item-notes'));
+      }
+      return item;
+    }
+
+    function renderCareerList(container, careersToRender) {
+      if (!container) return;
+      container.replaceChildren();
+      careersToRender.forEach((career) => container.appendChild(createCareerListItem(career)));
+    }
 
     function submitFitCheckForm(page) {
       const result = qs(page,'#fitResult');
@@ -855,7 +914,7 @@
       qs(page,'#fitVerdict').textContent=verdict;
       qs(page,'#fitVerdict').className='verdict '+cls;
       qs(page,'#fitVerdictBody').textContent=body;
-      qs(page,'#careerList').innerHTML=top.map(c=>`<div class="career-item"><div class="match">${c.match}% overall match · ${c.fitScore}% fit · ${c.readinessScore}% readiness</div><h4>${c.title}</h4><p>${c.blurb}</p><p style="margin-top:0.75rem;font-size:0.85rem;color:rgba(250,247,242,0.65);"><strong>Typical routes in SA:</strong> ${c.routes}</p>${c.readinessNotes.length?`<ul style="margin-top:0.75rem;padding-left:1.2rem;">${c.readinessNotes.map(n=>`<li style="font-size:0.85rem;color:rgba(250,247,242,0.78);">${n}</li>`).join('')}</ul>`:''}</div>`).join('');
+      renderCareerList(qs(page,'#careerList'), top);
       const impls=['This is a sense-check, not a verdict. Job-shadowing, vacation work and conversations with people in the field matter.','The readiness score is not a formal APS calculation. It flags whether your marks support common routes.','Take your top 1–2 matches to Route Compare and test a university route against a TVET/diploma or bridging alternative.'];
       if (profile.iPeo>75&&profile.iCar>70) impls.push('Strong people-and-care signal. Health, education and social work are worth investigating.');
       if (profile.iHan>70&&profile.wOut>60) impls.push('Hands-on plus outdoor preference favours trades, engineering site work, agriculture or skilled construction.');
@@ -905,7 +964,7 @@
         qs(page,'#fitVerdict').textContent=verdict;
         qs(page,'#fitVerdict').className='verdict '+cls;
         qs(page,'#fitVerdictBody').textContent=body;
-        qs(page,'#careerList').innerHTML=top.map(c=>`<div class="career-item"><div class="match">${c.match}% overall match · ${c.fitScore}% fit · ${c.readinessScore}% readiness</div><h4>${c.title}</h4><p>${c.blurb}</p><p style="margin-top:0.75rem;font-size:0.85rem;color:rgba(250,247,242,0.65);"><strong>Typical routes in SA:</strong> ${c.routes}</p>${c.readinessNotes.length?`<ul style="margin-top:0.75rem;padding-left:1.2rem;">${c.readinessNotes.map(n=>`<li style="font-size:0.85rem;color:rgba(250,247,242,0.78);">${n}</li>`).join('')}</ul>`:''}</div>`).join('');
+        renderCareerList(qs(page,'#careerList'), top);
         const impls=['This is a sense-check, not a verdict. Job-shadowing, vacation work and conversations with people in the field matter.','The readiness score is not a formal APS calculation. It flags whether your marks support common routes.','Take your top 1–2 matches to Route Compare and test a university route against a TVET/diploma or bridging alternative.'];
         if (profile.iPeo>75&&profile.iCar>70) impls.push('Strong people-and-care signal. Health, education and social work are worth investigating.');
         if (profile.iHan>70&&profile.wOut>60) impls.push('Hands-on plus outdoor preference favours trades, engineering site work, agriculture or skilled construction.');
@@ -1103,15 +1162,31 @@
       if (!fit||!fit.top||!fit.top.length) { empty.classList.remove('hidden'); result.classList.add('hidden'); return; }
       empty.classList.add('hidden'); result.classList.remove('hidden');
 
-      const ctx=[];
-      if (reality) ctx.push(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4);"><div><div class="pathway-fact-label">Affordability pressure</div><div class="pathway-fact-value">${titleCase(reality.pressure)}</div></div><div><div class="pathway-fact-label">Funding bracket</div><div class="pathway-fact-value">${reality.bracket}</div></div><div><div class="pathway-fact-label">Monthly study capacity</div><div class="pathway-fact-value">${formatR(reality.capacity)}</div></div><div><div class="pathway-fact-label">Monthly surplus before study</div><div class="pathway-fact-value">${formatR(reality.surplus)}</div></div></div>`);
-      if (cost) ctx.push(`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:var(--space-4);margin-top:var(--space-6);padding-top:var(--space-6);border-top:1px solid var(--line);"><div><div class="pathway-fact-label">Annual true cost</div><div class="pathway-fact-value">${formatR(cost.totalAnnual)}</div></div><div><div class="pathway-fact-label">Monthly burden</div><div class="pathway-fact-value">${formatR(cost.netMonthly)}</div></div><div><div class="pathway-fact-label">First-month cash need</div><div class="pathway-fact-value">${formatR(cost.firstMonthCost||0)}</div></div><div><div class="pathway-fact-label">Full-programme exposure</div><div class="pathway-fact-value">${formatR(cost.programmeTotal||0)}</div></div></div>`);
-      const fitDetails=fit.detailedTop&&fit.detailedTop.length?fit.detailedTop.slice(0,3).map(c=>`${c.title} (${c.match}% overall, ${c.readinessScore}% readiness)`).join('; '):fit.top.slice(0,3).join('; ');
-      ctx.push(`<p style="margin-top:var(--space-6);"><strong>Top career fits:</strong> ${fitDetails}.</p>`);
-      qs(page,'#contextSummary').innerHTML=ctx.join('');
-      qs(page,'#reportWarnings').innerHTML=renderReportWarnings(reality,cost,fit);
+      const ctxContainer = qs(page,'#contextSummary');
+      if (ctxContainer) {
+        ctxContainer.replaceChildren();
+        if (reality) {
+          ctxContainer.appendChild(createEl('div', { className: 'next-steps-facts-grid' }, [
+            createFactBlock('Affordability pressure', titleCase(reality.pressure)),
+            createFactBlock('Funding bracket', reality.bracket),
+            createFactBlock('Monthly study capacity', formatR(reality.capacity)),
+            createFactBlock('Monthly surplus before study', formatR(reality.surplus)),
+          ]));
+        }
+        if (cost) {
+          ctxContainer.appendChild(createEl('div', { className: 'next-steps-facts-grid next-steps-facts-grid-separated' }, [
+            createFactBlock('Annual true cost', formatR(cost.totalAnnual)),
+            createFactBlock('Monthly burden', formatR(cost.netMonthly)),
+            createFactBlock('First-month cash need', formatR(cost.firstMonthCost||0)),
+            createFactBlock('Full-programme exposure', formatR(cost.programmeTotal||0)),
+          ]));
+        }
+        const fitDetails = fit.detailedTop&&fit.detailedTop.length ? fit.detailedTop.slice(0,3).map(c => c.title + ' (' + c.match + '% overall, ' + c.readinessScore + '% readiness)').join('; ') : fit.top.slice(0,3).join('; ');
+        ctxContainer.appendChild(createStrongParagraph('Top career fits:', fitDetails + '.', 'next-steps-top-fits'));
+      }
+      renderReportWarnings(qs(page,'#reportWarnings'), reality, cost, fit);
 
-      recs.innerHTML=`<div class="form-section" style="margin-bottom:var(--space-12);"><span class="eyebrow">Recommended discussion order</span><h3>Use this order with your family</h3><ol style="padding-left:1.5rem;color:var(--ink-soft);line-height:1.8;margin-top:var(--space-4);"><li><strong>Can we carry the monthly cost?</strong> Compare the required monthly burden to your Reality Check capacity.</li><li><strong>Can we survive the first month?</strong> Registration, deposits, devices and transport often arrive together before the family has settled into a rhythm.</li><li><strong>Is the route accredited and realistic?</strong> Confirm admission, accreditation, funding and workplace exposure before paying deposits.</li><li><strong>Does the student fit the field?</strong> Use the fit and readiness scores to decide whether direct entry, diploma, TVET, bridging or work-and-study is safer.</li></ol></div>`+fit.top.slice(0,3).map((career,idx)=>renderCareerRecommendation(career,idx,fit)).join('');
+      recs.replaceChildren(createRecommendationIntro(), ...fit.top.slice(0,3).map((career,idx)=>createCareerRecommendationSection(career,idx,fit)));
       renderAlternativeFinder(qs(page, '#finalAlternativeFinder'), fit.top && fit.top[0] ? fit.top[0] : '', false);
       renderResidenceRisk(qs(page, '#finalResidenceRisk'), reality, cost);
       renderFundingGuidance(qs(page, '#finalFundingGuidance'), reality, cost, fit);
@@ -1176,11 +1251,29 @@
     function renderAlternativeFinder(container, currentTitle = '') {
       if (!container) return;
       const selectedKey = inferAlternativeKey(currentTitle);
-      const options = Object.keys(saferAlternativeLibrary).map(key => `<option value="${key}" ${key === selectedKey ? 'selected' : ''}>${saferAlternativeLibrary[key].label}</option>`).join('');
-      container.innerHTML = `<span class="eyebrow">Safer routes to compare</span><h3>Safer routes to compare</h3><p>Plan A may still be valid. This section simply gives the household related routes to investigate before committing money, debt or accommodation.</p><div class="alternative-controls"><div class="form-group" style="margin-bottom:0;"><label>Dream route / first choice</label><select data-alt-select>${options}</select></div><a href="/tools/route-compare" class="btn btn-secondary">Compare in Route Compare</a></div><div data-alt-note class="template-note"></div><div class="alternative-grid" data-alt-grid></div>`;
-      const select = container.querySelector('[data-alt-select]');
-      const render = () => renderAlternativeCards(container, select.value);
-      select.addEventListener('change', render);
+      const select = createEl('select', { attrs: { 'data-alt-select': '' } });
+      Object.keys(saferAlternativeLibrary).forEach((key) => {
+        const option = createEl('option', { value: key, text: saferAlternativeLibrary[key].label });
+        option.selected = key === selectedKey;
+        select.appendChild(option);
+      });
+      container.replaceChildren(
+        createEl('span', { className: 'eyebrow', text: 'Safer routes to compare' }),
+        createEl('h3', { text: 'Safer routes to compare' }),
+        createEl('p', { text: 'Plan A may still be valid. This section simply gives the household related routes to investigate before committing money, debt or accommodation.' }),
+        createEl('div', { className: 'alternative-controls' }, [
+          createEl('div', { className: 'form-group alternative-select-group' }, [
+            createEl('label', { text: 'Dream route / first choice' }),
+            select
+          ]),
+          createEl('a', { className: 'btn btn-secondary', href: '/tools/route-compare', text: 'Compare in Route Compare' })
+        ]),
+        createEl('div', { className: 'template-note', attrs: { 'data-alt-note': '' } }),
+        createEl('div', { className: 'alternative-grid', attrs: { 'data-alt-grid': '' } })
+      );
+      const selectEl = container.querySelector('[data-alt-select]');
+      const render = () => renderAlternativeCards(container, selectEl.value);
+      selectEl.addEventListener('change', render);
       render();
     }
 
@@ -1197,13 +1290,28 @@
       const note = container.querySelector('[data-alt-note]');
       const grid = container.querySelector('[data-alt-grid]');
       if (note) note.textContent = data.note;
-      if (grid) grid.innerHTML = data.alternatives.slice(0, 3).map(alt => `<div class="alternative-card"><div class="alt-tag">${alt.tag}</div><h4>${alt.title}</h4><p><strong>Why it may be safer:</strong> ${alt.why}</p><p><strong>Typical route:</strong> ${alt.route}</p><p><strong>What to ask next:</strong> ${alt.next}</p></div>`).join('');
+      if (grid) {
+        grid.replaceChildren();
+        data.alternatives.slice(0, 3).forEach((alt) => {
+          grid.appendChild(createEl('div', { className: 'alternative-card' }, [
+            createEl('div', { className: 'alt-tag', text: alt.tag }),
+            createEl('h4', { text: alt.title }),
+            createStrongParagraph('Why it may be safer:', alt.why),
+            createStrongParagraph('Typical route:', alt.route),
+            createStrongParagraph('What to ask next:', alt.next)
+          ]));
+        });
+      }
     }
 
     function renderResidenceRisk(container, reality, cost) {
       if (!container) return;
       if (!cost || !cost.breakdown) {
-        container.innerHTML = `<span class="eyebrow">Can we afford residence?</span><h3>Can we afford residence?</h3><p>Run the True Cost Calculator first so this section can read accommodation, food, transport and first-month setup costs.</p>`;
+        container.replaceChildren(
+          createEl('span', { className: 'eyebrow', text: 'Can we afford residence?' }),
+          createEl('h3', { text: 'Can we afford residence?' }),
+          createEl('p', { text: 'Run the True Cost Calculator first so this section can read accommodation, food, transport and first-month setup costs.' })
+        );
         return;
       }
       const b = cost.breakdown || {};
@@ -1223,13 +1331,45 @@
         else if (ratio > 0.40) { risk = 'Moderate risk'; cls = 'amber'; explanation = 'Living away may be possible, but it uses a meaningful part of the household capacity. Check deposits, food, transport-home costs and refund rules.'; }
         else { risk = 'Low risk'; cls = 'green'; explanation = 'Living-away costs appear to fit within the current study capacity, but deposits and first-month cash needs still need to be confirmed.'; }
       }
-      container.innerHTML = `<span class="eyebrow">Can we afford residence?</span><h3>Can we afford residence?</h3><p>${explanation}</p><div class="residence-risk-grid"><div class="residence-risk-item"><div class="residence-risk-label">Living-away monthly burden</div><div class="residence-risk-value">${formatR(livingMonthly)}/mo</div></div><div class="residence-risk-item"><div class="residence-risk-label">First-month cash need</div><div class="residence-risk-value">${formatR(firstMonth)}</div></div><div class="residence-risk-item"><div class="residence-risk-label">Residence risk</div><div class="residence-risk-value ${cls}">${risk}</div></div></div><ul><li>Compare a living-at-home route.</li><li>Compare a closer institution.</li><li>Compare a distance / online route.</li><li>Compare a TVET route where relevant.</li><li>Ask the institution about residence deposits, refund rules and cancellation deadlines.</li><li>Do not sign accommodation contracts until funding is confirmed in writing.</li></ul>`;
+      container.replaceChildren(
+        createEl('span', { className: 'eyebrow', text: 'Can we afford residence?' }),
+        createEl('h3', { text: 'Can we afford residence?' }),
+        createEl('p', { text: explanation }),
+        createEl('div', { className: 'residence-risk-grid' }, [
+          createEl('div', { className: 'residence-risk-item' }, [
+            createEl('div', { className: 'residence-risk-label', text: 'Living-away monthly burden' }),
+            createEl('div', { className: 'residence-risk-value', text: formatR(livingMonthly) + '/mo' }),
+          ]),
+          createEl('div', { className: 'residence-risk-item' }, [
+            createEl('div', { className: 'residence-risk-label', text: 'First-month cash need' }),
+            createEl('div', { className: 'residence-risk-value', text: formatR(firstMonth) }),
+          ]),
+          createEl('div', { className: 'residence-risk-item' }, [
+            createEl('div', { className: 'residence-risk-label', text: 'Residence risk' }),
+            createEl('div', { className: 'residence-risk-value ' + cls, text: risk }),
+          ]),
+        ]),
+        createListElement([
+          'Compare a living-at-home route.',
+          'Compare a closer institution.',
+          'Compare a distance / online route.',
+          'Compare a TVET route where relevant.',
+          'Ask the institution about residence deposits, refund rules and cancellation deadlines.',
+          'Do not sign accommodation contracts until funding is confirmed in writing.'
+        ])
+      );
     }
 
     function renderFundingGuidance(container, reality, cost, fit) {
       if (!container) return;
       const routes = buildFundingRoutes(reality, cost, fit);
-      container.innerHTML = `<span class="eyebrow">Funding routes to investigate</span><h2 style="font-size: clamp(1.6rem, 3vw, 2.25rem);">Funding routes to investigate</h2><p>This is not a bursary search or funding guarantee. It is a careful shortlist of funding routes worth investigating based on the information currently saved in your browser.</p><div class="funding-grid">${routes.map(route => renderFundingCard(route)).join('')}</div><p class="funding-warning"><strong>Funding warning:</strong> Do not pay non-refundable deposits, sign accommodation contracts or take private loans while assuming funding will be approved. Get funding outcomes, payment-plan terms and refund rules in writing.</p>`;
+      container.replaceChildren(
+        createEl('span', { className: 'eyebrow', text: 'Funding routes to investigate' }),
+        createEl('h2', { className: 'funding-heading', text: 'Funding routes to investigate' }),
+        createEl('p', { text: 'This is not a bursary search or funding guarantee. It is a careful shortlist of funding routes worth investigating based on the information currently saved in your browser.' }),
+        createEl('div', { className: 'funding-grid' }, routes.map(route => createFundingCard(route))),
+        createStrongParagraph('Funding warning:', 'Do not pay non-refundable deposits, sign accommodation contracts or take private loans while assuming funding will be approved. Get funding outcomes, payment-plan terms and refund rules in writing.', 'funding-warning')
+      );
     }
 
     function buildFundingRoutes(reality, cost, fit) {
@@ -1249,35 +1389,100 @@
       ];
     }
 
-    function renderFundingCard(route) {
-      return `<div class="funding-card ${route.level}"><div class="funding-tag">${route.relevance}</div><h4>${route.title}</h4><p><strong>Who this may fit:</strong> ${route.who}</p><p><strong>What to check:</strong> ${route.check}</p><p><strong>Risk warning:</strong> ${route.warning}</p></div>`;
+    function createFundingCard(route) {
+      return createEl('div', { className: 'funding-card ' + route.level }, [
+        createEl('div', { className: 'funding-tag', text: route.relevance }),
+        createEl('h4', { text: route.title }),
+        createStrongParagraph('Who this may fit:', route.who),
+        createStrongParagraph('What to check:', route.check),
+        createStrongParagraph('Risk warning:', route.warning)
+      ]);
     }
 
-    function renderCareerRecommendation(career, idx, fitData) {
+    function createCareerRecommendationSection(career, idx, fitData) {
       const path = pathways[career] || makePlaceholderPath(career);
-      const detail=fitData&&fitData.detailedTop?fitData.detailedTop.find(i=>i.title===career):null;
-      const detailBlock=detail?`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:var(--space-4);margin-bottom:var(--space-6);"><div><div class="pathway-fact-label">Overall match</div><div class="pathway-fact-value">${detail.match}%</div></div><div><div class="pathway-fact-label">Interest fit</div><div class="pathway-fact-value">${detail.fitScore}%</div></div><div><div class="pathway-fact-label">Readiness</div><div class="pathway-fact-value">${detail.readinessScore}%</div></div></div>`:'';
-      const readinessNotes=detail&&detail.readinessNotes&&detail.readinessNotes.length?`<div style="background:var(--paper-deep);border-left:3px solid var(--amber);padding:var(--space-4) var(--space-6);margin-bottom:var(--space-6);font-size:0.9rem;color:var(--ink-soft);"><strong>Readiness notes:</strong><ul style="padding-left:1.2rem;margin-top:0.5rem;">${detail.readinessNotes.map(n=>`<li>${n}</li>`).join('')}</ul></div>`:'';
-      return `<section style="padding:0;margin-bottom:var(--space-16);"><span class="eyebrow">Match #${idx+1}</span><h2 style="margin-bottom:var(--space-4);">${career}</h2>${detailBlock}${readinessNotes}<div style="background:var(--paper-deep);border-left:3px solid var(--terracotta);padding:var(--space-4) var(--space-6);margin-bottom:var(--space-6);font-size:0.9rem;color:var(--ink-soft);"><strong>Labour-market signal:</strong> ${path.oihd}</div>${renderPathwayCard('— Cheapest viable',path.cheapest,'')}${renderPathwayCard('— Highest employability',path.employable,'ink')}${renderPathwayCard('— Fastest to earning',path.fastest,'amber')}<div class="form-section" style="margin-top:var(--space-6);"><h3>Questions to ask before choosing this field</h3><ul style="padding-left:1.5rem;color:var(--ink-soft);line-height:1.8;"><li>What is the lowest-cost credible route into this field?</li><li>Which qualification level is enough to start earning?</li><li>Does this route require professional registration, workplace learning or articles?</li><li>Can the student test this field through job-shadowing, volunteering, vacation work or a short course first?</li></ul></div></section>`;
+      const detail = fitData && fitData.detailedTop ? fitData.detailedTop.find(i => i.title === career) : null;
+      const section = createEl('section', { className: 'career-recommendation' }, [
+        createEl('span', { className: 'eyebrow', text: 'Match #' + (idx + 1) }),
+        createEl('h2', { className: 'career-recommendation-title', text: career }),
+      ]);
+      if (detail) {
+        section.appendChild(createEl('div', { className: 'career-recommendation-facts' }, [
+          createFactBlock('Overall match', detail.match + '%'),
+          createFactBlock('Interest fit', detail.fitScore + '%'),
+          createFactBlock('Readiness', detail.readinessScore + '%'),
+        ]));
+      }
+      if (detail && detail.readinessNotes && detail.readinessNotes.length) {
+        section.appendChild(createEl('div', { className: 'pathway-support-list readiness-note-block' }, [
+          createStrongParagraph('Readiness notes:', '', 'pathway-support-intro'),
+          createListElement(detail.readinessNotes)
+        ]));
+      }
+      section.appendChild(createStrongParagraph('Labour-market signal:', path.oihd, 'pathway-support-list'));
+      section.appendChild(createPathwayCard('— Cheapest viable', path.cheapest, ''));
+      section.appendChild(createPathwayCard('— Highest employability', path.employable, 'ink'));
+      section.appendChild(createPathwayCard('— Fastest to earning', path.fastest, 'amber'));
+      section.appendChild(createEl('div', { className: 'form-section career-question-block' }, [
+        createEl('h3', { text: 'Questions to ask before choosing this field' }),
+        createListElement([
+          'What is the lowest-cost credible route into this field?',
+          'Which qualification level is enough to start earning?',
+          'Does this route require professional registration, workplace learning or articles?',
+          'Can the student test this field through job-shadowing, volunteering, vacation work or a short course first?'
+        ])
+      ]));
+      return section;
     }
 
-    function renderReportWarnings(reality, cost, fit) {
+    function renderReportWarnings(container, reality, cost, fit) {
+      if (!container) return;
       const warnings=[];
       if (!reality) warnings.push('Reality Check was not completed. The affordability section of this report is incomplete.');
       if (!cost) warnings.push('True Cost Calculator was not completed. The report does not yet show annual, monthly or full-programme exposure.');
-      if (reality&&cost&&reality.capacity>0&&cost.netMonthly>reality.capacity) warnings.push(`The last costed route appears to exceed monthly capacity by about ${formatR(cost.netMonthly-reality.capacity)} per month.`);
+      if (reality&&cost&&reality.capacity>0&&cost.netMonthly>reality.capacity) warnings.push('The last costed route appears to exceed monthly capacity by about ' + formatR(cost.netMonthly-reality.capacity) + ' per month.');
       if (cost&&cost.firstMonthCost&&cost.netMonthly&&cost.firstMonthCost>cost.netMonthly*1.8) warnings.push('The first-month cash need is materially higher than the average monthly burden. This may require planning before registration.');
       if (reality&&['severe','high'].includes(reality.pressure)) warnings.push('Household pressure is high. Prioritise funded, lower-cost, living-at-home, TVET, distance or work-and-study routes before high-debt routes.');
       if (fit&&fit.detailedTop&&fit.detailedTop.some(c=>c.readinessScore<65)) warnings.push('At least one high-interest career fit has a readiness warning. Consider bridging, diploma, TVET or extended-curriculum options rather than assuming direct degree entry.');
       if (!warnings.length) warnings.push('No major automated warning was triggered. All fees, admission rules, accreditation and funding must still be verified directly before any commitment.');
-      return `<span class="eyebrow">Warning flags</span><h3>Before anyone commits money</h3><ul style="padding-left:1.5rem;color:var(--ink-soft);line-height:1.8;margin-top:var(--space-4);">${warnings.map(w=>`<li>${w}</li>`).join('')}</ul><p style="margin-top:var(--space-6);color:var(--ink-mute);font-size:0.92rem;">This section is automated decision support. It does not replace direct verification with institutions, funders or professional bodies.</p>`;
+      container.replaceChildren(
+        createEl('span', { className: 'eyebrow', text: 'Warning flags' }),
+        createEl('h3', { text: 'Before anyone commits money' }),
+        createListElement(warnings, 'warning-list'),
+        createEl('p', { className: 'warning-support-text', text: 'This section is automated decision support. It does not replace direct verification with institutions, funders or professional bodies.' })
+      );
     }
 
-    function renderPathwayCard(label, p, cls) {
-      return `<div class="pathway-card ${cls}"><div class="pathway-label">${label}</div><h3>${p.title}</h3><p>${p.summary}</p><div class="pathway-facts"><div><div class="pathway-fact-label">Cost</div><div class="pathway-fact-value">${p.cost}</div></div><div><div class="pathway-fact-label">Duration</div><div class="pathway-fact-value">${p.duration}</div></div><div><div class="pathway-fact-label">Qualification</div><div class="pathway-fact-value">${p.qualification}</div></div></div>${p.tradeoffs?`<p><strong>Trade-offs:</strong> ${p.tradeoffs}</p>`:''}<p style="margin:0;"><strong style="color:var(--terracotta);">This week:</strong> ${p.thisWeek}</p></div>`;
+    function createPathwayCard(label, p, cls) {
+      const card = createEl('div', { className: ('pathway-card ' + cls).trim() }, [
+        createEl('div', { className: 'pathway-label', text: label }),
+        createEl('h3', { text: p.title }),
+        createEl('p', { text: p.summary }),
+        createEl('div', { className: 'pathway-facts' }, [
+          createFactBlock('Cost', p.cost),
+          createFactBlock('Duration', p.duration),
+          createFactBlock('Qualification', p.qualification),
+        ]),
+      ]);
+      if (p.tradeoffs) card.appendChild(createStrongParagraph('Trade-offs:', p.tradeoffs));
+      card.appendChild(createStrongParagraph('This week:', p.thisWeek, 'pathway-this-week'));
+      return card;
     }
 
+    function createRecommendationIntro() {
+      return createEl('div', { className: 'form-section recommendation-intro' }, [
+        createEl('span', { className: 'eyebrow', text: 'Recommended discussion order' }),
+        createEl('h3', { text: 'Use this order with your family' }),
+        createListElement([
+          'Can we carry the monthly cost? Compare the required monthly burden to your Reality Check capacity.',
+          'Can we survive the first month? Registration, deposits, devices and transport often arrive together before the family has settled into a rhythm.',
+          'Is the route accredited and realistic? Confirm admission, accreditation, funding and workplace exposure before paying deposits.',
+          'Does the student fit the field? Use the fit and readiness scores to decide whether direct entry, diploma, TVET, bridging or work-and-study is safer.'
+        ], 'recommendation-order')
+      ]);
+    }
 
+    if (document.readyState === 'loading') {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', bootDharmaTools);
     } else {
