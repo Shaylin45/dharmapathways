@@ -527,3 +527,25 @@
 .employment-why-card p, .employment-why-card li { color: rgba(250,247,242,0.84); font-size: 0.92rem; }
 @media (max-width: 900px) { .route-live-summary, .employment-why-grid { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .route-react-tool .segmented { grid-template-columns: 1fr; } }
+
+/* React Career Fit */
+.fit-react-tool .fit-extra-grid { margin-top: var(--space-6); }
+.fit-live-preview { background: var(--paper-deep); border-left: 4px solid var(--sage); padding: var(--space-8); margin-top: var(--space-6); }
+.fit-live-preview h3 { margin-bottom: var(--space-4); }
+.fit-live-preview p { margin-top: var(--space-4); margin-bottom: 0; }
+.fit-score-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin: var(--space-4) 0; }
+.fit-score-pill { border: 1px solid rgba(250,247,242,0.18); background: rgba(250,247,242,0.08); padding: var(--space-3); border-left: 3px solid var(--line); }
+.fit-live-preview .fit-score-pill { background: var(--paper); border-color: var(--line); }
+.fit-score-pill span { display: block; font-size: 0.68rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(250,247,242,0.58); margin-bottom: 0.25rem; }
+.fit-live-preview .fit-score-pill span { color: var(--ink-mute); }
+.fit-score-pill strong { display: block; font-family: var(--display); color: var(--paper); font-size: 1.55rem; line-height: 1; }
+.fit-live-preview .fit-score-pill strong { color: var(--ink); }
+.fit-score-pill.green { border-left-color: #a8d4b3; }
+.fit-score-pill.amber { border-left-color: #e8b870; }
+.fit-score-pill.red { border-left-color: var(--terracotta-soft); }
+.fit-v2-card .fit-score-row { margin-top: 0; }
+.fit-v2-card .fit-muted { margin-top: 0.75rem; font-size: 0.88rem; color: rgba(250,247,242,0.68); }
+.fit-v2-card ul { margin-top: var(--space-3); padding-left: 1.2rem; }
+.fit-v2-card li { font-size: 0.88rem; color: rgba(250,247,242,0.78); }
+.result-panel .readiness-plan .alternative-grid { margin-top: var(--space-6); }
+@media (max-width: 760px) { .fit-score-row { grid-template-columns: 1fr; } }

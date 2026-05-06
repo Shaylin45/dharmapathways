@@ -1,6 +1,5 @@
-import RawHtml from '@/components/RawHtml';
-import { fit_checkHtml } from '@/components/pageHtml';
+import { CareerFitCheck } from '@/components/tools/CareerFitCheck';
 
 export default function Page() {
-  return <RawHtml html={fit_checkHtml} />;
+  return <CareerFitCheck />;
 }
