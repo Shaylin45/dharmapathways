@@ -277,6 +277,9 @@
     .result-panel .question-generator { background: rgba(250,247,242,0.08); border-color: rgba(250,247,242,0.16); }
     .question-output { background: var(--paper); border: 1px solid var(--line); padding: var(--space-6); margin-top: var(--space-6); white-space: pre-wrap; font-family: var(--body); color: var(--ink-soft); border-radius: 2px; }
     .result-panel .question-output { background: rgba(250,247,242,0.94); color: var(--ink-soft); }
+    .result-panel .question-generator h3 { color: var(--paper); }
+    .result-panel .question-output ol,
+    .result-panel .question-output li { color: var(--ink-soft); }
     .action-checklist { background: rgba(250,247,242,0.08); border: 1px solid rgba(250,247,242,0.16); padding: var(--space-6); margin-top: var(--space-8); border-radius: 2px; }
     .action-checklist h4 { color: var(--paper); margin-bottom: var(--space-4); }
     .action-checklist label { display: flex; gap: var(--space-3); align-items: flex-start; color: rgba(250,247,242,0.88); margin-bottom: var(--space-3); cursor: pointer; line-height: 1.45; }
