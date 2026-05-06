@@ -1,6 +1,5 @@
-import RawHtml from '@/components/RawHtml';
-import { next_stepsHtml } from '@/components/pageHtml';
+import { NextStepsReport } from '@/components/tools/NextStepsReport';
 
 export default function Page() {
-  return <RawHtml html={next_stepsHtml} />;
+  return <NextStepsReport />;
 }
