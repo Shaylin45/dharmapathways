@@ -699,61 +699,10 @@
         slider.addEventListener('input', () => out.textContent = slider.value + '%');
       });
 
-      const qualLabels = { hcert:'Higher Certificate', acert:'Advanced Certificate', diploma:'Diploma', adip:'Advanced Diploma', bachelor:"Bachelor’s", hons:'Honours', pgdip:'PG Diploma', masters:"Master’s", phd:'Doctorate', ncv:'TVET', trade:'Trade' };
       form.addEventListener('reset', () => { result.classList.add('hidden'); qs(page,'#aJobOut').textContent='50%'; qs(page,'#bJobOut').textContent='50%'; });
       form.addEventListener('submit', e => {
         e.preventDefault();
-        const a = readRoute(page,'a'), b = readRoute(page,'b');
-        const sa = scoreRoute(a), sb = scoreRoute(b);
-        qs(page,'#thA').textContent = a.name;
-        qs(page,'#thB').textContent = b.name;
-
-        const rows = [
-          ['Qualification level', qualLabels[a.qual]||'—', qualLabels[b.qual]||'—', '—'],
-          ['Total cost', formatR(a.cost), formatR(b.cost), edge(a.name,b.name,a.cost,b.cost,'lower')],
-          ['Time invested', a.duration+' years', b.duration+' years', edge(a.name,b.name,a.duration,b.duration,'lower')],
-          ['Funding secured', a.support+'%', b.support+'%', edge(a.name,b.name,a.support,b.support,'higher')],
-          ['Funding certainty', a.fundingCertainty+'/100', b.fundingCertainty+'/100', edge(a.name,b.name,a.fundingCertainty,b.fundingCertainty,'higher')],
-          ['Admission realism', a.admission+'/100', b.admission+'/100', edge(a.name,b.name,a.admission,b.admission,'higher')],
-          ['Accreditation confidence', a.accreditation+'/100', b.accreditation+'/100', edge(a.name,b.name,a.accreditation,b.accreditation,'higher')],
-          ['Completion confidence', a.completion+'/100', b.completion+'/100', edge(a.name,b.name,a.completion,b.completion,'higher')],
-          ['Workplace exposure', a.workIntegrated+'/100', b.workIntegrated+'/100', edge(a.name,b.name,a.workIntegrated,b.workIntegrated,'higher')],
-          ['Job certainty', a.job+'%', b.job+'%', edge(a.name,b.name,a.job,b.job,'higher')],
-          ['Out-of-pocket exposure', formatR(sa.exposure), formatR(sb.exposure), edge(a.name,b.name,sa.exposure,sb.exposure,'lower')],
-          ['Overall safety score', Math.round(sa.total)+'/100', Math.round(sb.total)+'/100', Math.abs(sa.total-sb.total)<5?'Tied':(sa.total>sb.total?a.name:b.name)]
-        ];
-
-        renderCompareRows(qs(page,'#compareTbody'), rows, a.name, b.name);
-
-        const diff = sa.total - sb.total;
-        let verdict, body;
-        if (Math.abs(diff) < 5) { verdict = `${a.name} and ${b.name} are roughly equivalent.`; body = 'Neither is meaningfully safer. Fit and household preference should decide.'; }
-        else if (diff > 0) { verdict = `${a.name} is the safer route on these inputs.`; body = `${a.name} scores ${Math.round(sa.total)}/100 vs ${Math.round(sb.total)}/100 for ${b.name}.`; }
-        else { verdict = `${b.name} is the safer route on these inputs.`; body = `${b.name} scores ${Math.round(sb.total)}/100 vs ${Math.round(sa.total)}/100 for ${a.name}.`; }
-        qs(page,'#routeVerdict').textContent = verdict;
-        qs(page,'#routeVerdict').className = 'verdict ' + (Math.abs(diff)<5?'amber':'green');
-        qs(page,'#routeVerdictBody').textContent = body;
-
-        const impls = [];
-        const reality = dharmaStore.get('reality');
-        if (reality && reality.capacity > 0) {
-          const aM = sa.exposure/(a.duration*12), bM = sb.exposure/(b.duration*12);
-          if (aM>reality.capacity||bM>reality.capacity) impls.push(`Monthly check: ${a.name} needs ~${formatR(aM)}/mo, ${b.name} needs ~${formatR(bM)}/mo, against your capacity of ${formatR(reality.capacity)}/mo.`);
-        }
-        if (a.duration>4||b.duration>4) impls.push('Programmes longer than four years carry greater dropout and cost-overrun risk.');
-        if (a.job<50||b.job<50) impls.push('One route has below-50% job certainty. Treat that as high-risk unless you have specific evidence.');
-        if (a.accreditation<60||b.accreditation<60) impls.push('One route has unverified accreditation. Do not pay deposits until official accreditation is confirmed.');
-        if (a.admission<50||b.admission<50) impls.push('One route is a stretch for admission. Have a backup route ready before relying on it.');
-        if (a.fundingCertainty<50||b.fundingCertainty<50) impls.push('One route depends on uncertain funding. Treat it as provisional until confirmed in writing.');
-        if (a.completion<55||b.completion<55) impls.push('One route has high completion risk. Ask about support structures, repeat-year costs and pass rates.');
-        if (a.workIntegrated<60||b.workIntegrated<60) impls.push('One route has weak workplace exposure. This can make first-job entry harder even with the qualification.');
-        if (sa.exposure>300000||sb.exposure>300000) impls.push('One or both options carry over R300,000 of exposure. Make sure earning potential justifies the debt.');
-        if (!impls.length) impls.push('Both routes look broadly reasonable. Career Fit is now the deciding factor.');
-
-        renderList(qs(page,'#routeImplications'), impls);
-        dharmaStore.set('compare', { a, b, sa, sb });
-        result.classList.remove('hidden');
-        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        submitRouteCompareForm(page);
       });
     }
 
